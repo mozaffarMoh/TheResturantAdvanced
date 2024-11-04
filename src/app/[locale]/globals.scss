@@ -1,0 +1,126 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Jost:wght@400&display=swap');
+/* Extra Bold */
+@font-face {
+  font-family: 'Bahij TheSansArabic';
+  src: url('/fonts/BhjiArabicFont/Bahij_TheSansArabic-ExtraBold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+
+/* Bold */
+@font-face {
+  font-family: 'Bahij TheSansArabic';
+  src: url('/fonts/BhjiArabicFont/Bahij_TheSansArabic-Bold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+/* Semi-Bold */
+@font-face {
+  font-family: 'Bahij TheSansArabic';
+  src: url('/fonts/BhjiArabicFont/Bahij_TheSansArabic-SemiBold.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+/* Plain */
+@font-face {
+  font-family: 'Bahij TheSansArabic';
+  src: url('/fonts/BhjiArabicFont/Bahij_TheSansArabic-Plain.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* Light */
+@font-face {
+  font-family: 'Bahij TheSansArabic';
+  src: url('/fonts/BhjiArabicFont/Bahij_TheSansArabic-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+
+* {
+  padding: 0px;
+  margin: 0px;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+  user-select: none;
+}
+
+body {
+  overflow-x: hidden !important;
+  background-color: #f1a212
+}
+
+.arabicFont {
+  * {
+    font-family: 'Bahij TheSansArabic' !important;
+    direction: rtl;
+  }
+}
+
+ .englishFont {
+  * {
+    font-family: 'Jost' !important;
+  }
+}
+
+
+
+
+.flexCenter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.flexStart {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.flexCenterColumn {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.flexBetweenColumn {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+@media (max-width : 600px) {
+  * {
+    font-family: sans-serif;
+  }
+}
+
+
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgb(114, 86, 50);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: whitesmoke;
+}
+
+.scrollable-section {
+  max-height: fit-content;
+  transition: 0.3s linear;
+}
