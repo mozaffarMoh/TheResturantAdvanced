@@ -9,25 +9,16 @@ let client: MongoClient;
 let clientPromise: Promise<MongoClient>;
 
 if (!process.env.MONGODB_URI) {
-  throw new Error("Please add your Mongo URI to .env");
+  console.error("Please add your Mongo URI to .env");
 }
 
-if (process.env.NODE_ENV === 'development') {
-  if (!global._mongoClientPromise) {
-    client = new MongoClient(uri);
-    global._mongoClientPromise = client.connect().catch(error => {
-      console.error("Failed to connect to MongoDB:", error);
-      throw error;
-    });
-  }
-  clientPromise = global._mongoClientPromise;
-} else {
-  client = new MongoClient(uri);
-  clientPromise = client.connect().catch(error => {
-    console.error("Failed to connect to MongoDB:", error);
-    throw error;
-  });
-}
+
+client = new MongoClient(uri);
+clientPromise = client.connect().catch(error => {
+  console.error("Failed to connect to MongoDB:", error);
+  throw error;
+});
+
 export default clientPromise;
 
 

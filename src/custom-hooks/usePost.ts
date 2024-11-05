@@ -31,6 +31,8 @@ const usePost = (endPoint: string, body: any): any => {
             })
             .catch((err: any) => {
                 setLoading(false);
+                console.log(err);
+                
                 setFullData(err.response?.data)
                 setErrorMessage(err.response?.data?.message)
                 setTimeout(() => {

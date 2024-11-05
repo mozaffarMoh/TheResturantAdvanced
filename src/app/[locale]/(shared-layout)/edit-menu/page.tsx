@@ -18,12 +18,7 @@ import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Delete, Edit } from '@mui/icons-material';
-import {
-  fourthColor,
-  primaryColor,
-  secondaryColor,
-  thirdColor,
-} from '@/constant/color';
+import { fourthColor, primaryColor, secondaryColor } from '@/constant/color';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
@@ -42,7 +37,7 @@ const MenuEdit = () => {
   const [currentId, setCurrentId] = useState(0);
   const [showEditMode, setShowEditMode] = useState(false);
   const [showAddItem, setShowAddItem] = useState(false);
-  const [errorMessageFile, setErrorMessageFile] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string>('');
   const [currentType, setCurrentType] = useState('');
   const [name, setName] = useState('');
   const [price, setPrice] = useState(0);
@@ -57,17 +52,31 @@ const MenuEdit = () => {
       image: uploadedFile,
     },
   };
-  const [, loadingAddItem, handleAddItem, successAddItem] = usePost(
-    '/en/api/menu',
-    bodyAdd,
-  );
+  const [
+    ,
+    loadingAddItem,
+    handleAddItem,
+    successAddItem,
+    successAddItemMessage,
+    errorAddItemMessage,
+  ] = usePost('/en/api/menu', bodyAdd);
 
-  const [, loadingEditItem, handleEditItemProcess, successEditItem] = usePut(
-    '/en/api/menu',
-    bodyAdd,
-  );
-  const [, loadingDeleteItem, handleDeleteItemProcess, successDeleteItem] =
-    useDelete('/en/api/menu', { itemId: currentId, type: currentType });
+  const [
+    ,
+    loadingEditItem,
+    handleEditItemProcess,
+    successEditItem,
+    successEditItemMessage,
+    errorEditItemMessage,
+  ] = usePut('/en/api/menu', bodyAdd);
+  const [
+    ,
+    loadingDeleteItem,
+    handleDeleteItemProcess,
+    successDeleteItem,
+    successDeleteItemMessage,
+    errorDeleteItemMessage,
+  ] = useDelete('/en/api/menu', { itemId: currentId, type: currentType });
 
   const [menuItems, loading, getMenu] = useGet('/en/api/menu');
 
@@ -139,10 +148,10 @@ const MenuEdit = () => {
             let fileConverted: any = await Base64(file);
             setUploadedFile(fileConverted);
           } else {
-            setErrorMessageFile(t('messages.image-max-size-error'));
+            setErrorMessage(t('messages.image-max-size-error'));
           }
         } else {
-          setErrorMessageFile(t('messages.image-type-error'));
+          setErrorMessage(t('messages.image-type-error'));
         }
       }
     }
@@ -161,6 +170,25 @@ const MenuEdit = () => {
     }
   }, [successAddItem, successDeleteItem, successEditItem]);
 
+  /* Add or edit */
+  const handleProcess = (process: string) => {
+    if (!name) {
+      setErrorMessage(t('messages.not-empty'));
+      return;
+    }
+    if (process == 'edit') handleEditItemProcess();
+    if (process == 'add') handleAddItem();
+  };
+
+  /* empty the error message */
+  useEffect(() => {
+    if (errorMessage) {
+      setTimeout(() => {
+        setErrorMessage('');
+      }, 3000);
+    }
+  }, [errorMessage]);
+
   return (
     <Container>
       <ConfirmationModal
@@ -170,10 +198,35 @@ const MenuEdit = () => {
         loading={loadingDeleteItem}
         message={t('messages.delete-item')}
       />
+   <CustomAlert
+        openAlert={
+          Boolean(errorMessage) ||
+          Boolean(errorDeleteItemMessage) ||
+          Boolean(errorAddItemMessage) ||
+          Boolean(errorEditItemMessage)
+        }
+        setOpenAlert={() => setErrorMessage('')}
+        message={
+          errorMessage ||
+          errorDeleteItemMessage ||
+          errorAddItemMessage ||
+          errorEditItemMessage
+        }
+      />
+
       <CustomAlert
-        openAlert={Boolean(errorMessageFile)}
-        setOpenAlert={() => setErrorMessageFile('')}
-        message={errorMessageFile}
+        openAlert={
+          Boolean(successAddItemMessage) ||
+          Boolean(successEditItemMessage) ||
+          Boolean(successDeleteItemMessage)
+        }
+        type="success"
+        setOpenAlert={() => {}}
+        message={
+          successAddItemMessage ||
+          successEditItemMessage ||
+          successDeleteItemMessage
+        }
       />
 
       <Stack
@@ -278,7 +331,10 @@ const MenuEdit = () => {
                                   }}
                                 />
                               ) : (
-                                row.price + '$'
+                                <Typography>
+                                  {row?.price}
+                                  <span style={{ fontWeight: '600' }}>$</span>
+                                </Typography>
                               )}
                             </TableCell>
                             <TableCell align="center">
@@ -336,7 +392,7 @@ const MenuEdit = () => {
                                     />
                                     <CheckCircleIcon
                                       sx={primaryObj}
-                                      onClick={handleEditItemProcess}
+                                      onClick={() => handleProcess('edit')}
                                     />
                                   </>
                                 )
@@ -427,16 +483,16 @@ const MenuEdit = () => {
                             )}
                           </TableCell>
                           <TableCell align="center">
-                            <LoadingButton
+                            <Button
                               sx={secondaryObj}
                               onClick={handleCancel}
                             >
                               {t('buttons.cancel')}
-                            </LoadingButton>
+                            </Button>
                             <LoadingButton
                               sx={primaryObj}
-                              onClick={handleAddItem}
                               loading={loadingAddItem}
+                              onClick={() => handleProcess('add')}
                             >
                               {t('buttons.add')}
                             </LoadingButton>

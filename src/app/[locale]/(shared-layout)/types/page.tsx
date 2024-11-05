@@ -1,7 +1,6 @@
 'use client';
 import useGet from '@/custom-hooks/useGet';
 import {
-  CircularProgress,
   Container,
   Paper,
   Skeleton,
@@ -16,21 +15,12 @@ import {
 import { Typography, Button } from '@mui/material';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
-import { Delete, Edit } from '@mui/icons-material';
 import {
-  fourthColor,
   primaryColor,
   secondaryColor,
-  thirdColor,
 } from '@/constant/color';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
-import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
-import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported';
 import { ConfirmationModal, CustomAlert } from '@/components';
 import { Input } from 'antd';
-import Base64 from '@/constant/Base64';
 import { LoadingButton } from '@mui/lab';
 import usePost from '@/custom-hooks/usePost';
 import useDelete from '@/custom-hooks/useDelete';
@@ -45,17 +35,31 @@ const MenuEdit = () => {
   const [currentType, setCurrentType] = useState('');
   const [newType, setNewType] = useState('');
 
-  const [, loadingAddNewType, handleAddNewType, successAddNewType] = usePost(
-    '/en/api/types',
-    { newType: newType },
-  );
+  const [
+    ,
+    loadingAddNewType,
+    handleAddNewType,
+    successAddNewType,
+    successAddNewTypeMessage,
+    errorAddNewTypeMessage,
+  ] = usePost('/en/api/types', { newType: newType });
 
-  const [, loadingEditItem, handleEditItemProcess, successEditItem] = usePut(
-    '/en/api/types',
-    { itemId: currentId, updatedType: currentType },
-  );
-  const [, loadingDeleteItem, handleDeleteItemProcess, successDeleteItem] =
-    useDelete('/en/api/types', { itemId: currentId });
+  const [
+    ,
+    loadingEditType,
+    handleEditTypeProcess,
+    successEditType,
+    successEditTypeMessage,
+    errorEditTypeMessage,
+  ] = usePut('/en/api/types', { itemId: currentId, updatedType: currentType });
+  const [
+    ,
+    loadingDeleteType,
+    handleDeleteTypeProcess,
+    successDeleteType,
+    successDeleteTypeMessage,
+    errorDeleteTypeMessage,
+  ] = useDelete('/en/api/types', { itemId: currentId });
 
   const [menuItems, loading, getMenu, success] = useGet('/en/api/types');
 
@@ -86,21 +90,21 @@ const MenuEdit = () => {
   };
 
   useEffect(() => {
-    if (successDeleteItem || successEditItem || successAddNewType) {
+    if (successDeleteType || successEditType || successAddNewType) {
       handleCancel();
       getMenu();
     }
-  }, [successDeleteItem, successEditItem, successAddNewType]);
+  }, [successDeleteType, successEditType, successAddNewType]);
 
   /* Add or edit */
   const handleProcess = (process: string) => {
     if (process == 'edit') {
-      !currentId
-        ? setErrorMessage('field should not empty')
-        : handleEditItemProcess;
+      !currentType
+        ? setErrorMessage(t('messages.not-empty'))
+        : handleEditTypeProcess();
     }
     if (process == 'add') {
-      !newType ? setErrorMessage('field should not empty') : handleAddNewType;
+      !newType ? setErrorMessage(t('messages.not-empty')) : handleAddNewType();
     }
   };
 
@@ -118,14 +122,40 @@ const MenuEdit = () => {
       <ConfirmationModal
         open={showDeleteConfirmation}
         handleCancel={() => setShowDeleteConfirmation(false)}
-        handleConfirm={handleDeleteItemProcess}
-        loading={loadingDeleteItem}
+        handleConfirm={handleDeleteTypeProcess}
+        loading={loadingDeleteType}
         message={t('messages.delete-item')}
       />
+
       <CustomAlert
-        openAlert={Boolean(errorMessage)}
+        openAlert={
+          Boolean(errorMessage) ||
+          Boolean(errorDeleteTypeMessage) ||
+          Boolean(errorAddNewTypeMessage) ||
+          Boolean(errorEditTypeMessage)
+        }
         setOpenAlert={() => setErrorMessage('')}
-        message={errorMessage}
+        message={
+          errorMessage ||
+          errorDeleteTypeMessage ||
+          errorAddNewTypeMessage ||
+          errorEditTypeMessage
+        }
+      />
+
+      <CustomAlert
+        openAlert={
+          Boolean(successAddNewTypeMessage) ||
+          Boolean(successEditTypeMessage) ||
+          Boolean(successDeleteTypeMessage)
+        }
+        type="success"
+        setOpenAlert={() => {}}
+        message={
+          successAddNewTypeMessage ||
+          successEditTypeMessage ||
+          successDeleteTypeMessage
+        }
       />
 
       <Stack
@@ -173,7 +203,6 @@ const MenuEdit = () => {
                 : menuItems &&
                   menuItems.map((item: any, i: number) => {
                     let isEdit = showEditMode && item?.id == currentId;
-                    console.log(currentId, '$$$', item?.id);
 
                     return (
                       <TableRow key={item?.id}>
@@ -204,7 +233,7 @@ const MenuEdit = () => {
                             {isEdit ? t('buttons.cancel') : t('buttons.delete')}
                           </Button>
                           <LoadingButton
-                            loading={isEdit && loadingEditItem}
+                            loading={isEdit && loadingEditType}
                             variant="contained"
                             color="warning"
                             sx={{

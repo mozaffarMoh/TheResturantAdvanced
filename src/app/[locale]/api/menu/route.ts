@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
     const menuItems = await db.collection('menu').find({}).toArray();
     return NextResponse.json({ success: true, data: menuItems });
   } catch (error) {
-    return NextResponse.json({ success: false, error: 'Database connection error' }, { status: 500 });
+    return NextResponse.json({ success: false, message: 'Database connection error' }, { status: 500 });
   }
 }
 
@@ -30,9 +30,9 @@ export async function POST(req: NextRequest) {
       { upsert: true } // If type doesn't exist, create a new object
     );
 
-    return NextResponse.json({ success: true, data: result });
+    return NextResponse.json({ success: true, message: 'Item has been added successfuly' });
   } catch (error) {
-    return NextResponse.json({ success: false, error: ['Failed to add item'] }, { status: 500 });
+    return NextResponse.json({ success: false, message: 'Failed to add item' }, { status: 500 });
   }
 }
 
@@ -44,7 +44,7 @@ export async function DELETE(req: NextRequest) {
     const db = client.db('menu');
 
     if (!itemId) {
-      return NextResponse.json({ success: false, error: 'Id is not eixt' }, { status: 400 });
+      return NextResponse.json({ success: false, message: 'Item is not eixt' }, { status: 400 });
     }
 
     const result: any = await db.collection('menu').updateOne(
@@ -55,7 +55,7 @@ export async function DELETE(req: NextRequest) {
     if (result.modifiedCount === 0) {
       return NextResponse.json({
         success: false,
-        error: 'Item not found or already deleted',
+        message: 'Item not found or already deleted',
       }, { status: 404 }
       );
     }
@@ -63,7 +63,7 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ success: true, message: 'Item deleted successfully' });
   } catch (error) {
     console.error('Error deleting item:', error);
-    return NextResponse.json({ success: false, error: 'Failed to delete item' }, { status: 500 });
+    return NextResponse.json({ success: false, message: 'Failed to delete item' }, { status: 500 });
   }
 }
 
@@ -87,8 +87,8 @@ export async function PUT(req: NextRequest) {
       }
     );
 
-    return NextResponse.json({ success: true, data: result });
+    return NextResponse.json({ success: true, message: 'Update type success' });
   } catch (error) {
-    return NextResponse.json({ success: false, error: ['Failed to update item'] }, { status: 500 });
+    return NextResponse.json({ success: false, message: 'Failed to update item' }, { status: 500 });
   }
 }

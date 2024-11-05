@@ -44,7 +44,8 @@
         "delete-item": "Are you sure you want to delete this item",
         "no-data": "No Data",
         "image-type-error": "file type is not supported",
-        "image-max-size-error": "Image should be 1MB or less"
+        "image-max-size-error": "Image should be 1MB or less",
+        "not-empty":"Value shuold not be empty"
     },
     "labels": {
         "add-type": "Add Type"

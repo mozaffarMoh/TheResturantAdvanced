@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
     })
     return NextResponse.json({ success: true, data: types });
   } catch (error) {
-    return NextResponse.json({ success: false, error: 'Database connection error' }, { status: 500 });
+    return NextResponse.json({ success: false, message: 'Database connection error' }, { status: 500 });
   }
 }
 
@@ -22,14 +22,14 @@ export async function POST(req: NextRequest) {
     const db = client.db('menu');
     const newItem = await req.json();
     const { newType } = newItem;
-    const dataWithId = { type:newType, data: [], _id: new ObjectId() };
+    const dataWithId = { type: newType, data: [], _id: new ObjectId() };
     const result = await db.collection('menu').insertOne(
       dataWithId
     );
 
-    return NextResponse.json({ success: true, data: result });
+    return NextResponse.json({ success: true, message: 'Type has been added successfuly' });
   } catch (error) {
-    return NextResponse.json({ success: false, error: ['Failed to add item'] }, { status: 500 });
+    return NextResponse.json({ success: false, message: 'Failed to add item' }, { status: 500 });
   }
 }
 
@@ -43,7 +43,7 @@ export async function DELETE(req: NextRequest) {
     const db = client.db('menu');
 
     if (!objId) {
-      return NextResponse.json({ success: false, error: 'Id is not exist' }, { status: 400 });
+      return NextResponse.json({ success: false, message: 'Id is not exist' }, { status: 400 });
     }
 
     const result: any = await db.collection('menu').findOneAndDelete(
@@ -61,7 +61,7 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ success: true, message: 'Item deleted successfully' });
   } catch (error) {
     console.error('Error deleting item:', error);
-    return NextResponse.json({ success: false, error: 'Failed to delete item' }, { status: 500 });
+    return NextResponse.json({ success: false, message: 'Failed to delete item' }, { status: 500 });
   }
 }
 
@@ -76,11 +76,11 @@ export async function PUT(req: NextRequest) {
       { _id: new ObjectId(itemId) },
       { $set: { type: updatedType } },
       { returnDocument: 'after' } // returns the updated document
-   
+
     );
 
-    return NextResponse.json({ success: true, data: result });
+    return NextResponse.json({ success: true, message: 'Update type success' });
   } catch (error) {
-    return NextResponse.json({ success: false, error: ['Failed to update item'] }, { status: 500 });
+    return NextResponse.json({ success: false, message: 'Failed to update item' }, { status: 500 });
   }
 }
