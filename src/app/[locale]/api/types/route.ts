@@ -2,16 +2,27 @@ import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
 
-
+export async function GET(req: NextRequest) {
+  try {
+    const client = await clientPromise;
+    const db = client.db('menu');
+    const menuItems = await db.collection('menu').find({}).toArray();
+    let types = menuItems.map((item) => {
+      return { type: item.type, id: item._id }
+    })
+    return NextResponse.json({ success: true, data: types });
+  } catch (error) {
+    return NextResponse.json({ success: false, error: 'Database connection error' }, { status: 500 });
+  }
+}
 
 export async function POST(req: NextRequest) {
-
   try {
     const client = await clientPromise;
     const db = client.db('menu');
     const newItem = await req.json();
-    const { type } = newItem;
-    const dataWithId = { type, data: [], _id: new ObjectId() };
+    const { newType } = newItem;
+    const dataWithId = { type:newType, data: [], _id: new ObjectId() };
     const result = await db.collection('menu').insertOne(
       dataWithId
     );
@@ -23,19 +34,20 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const { itemId, type } = await req.json();
+  const { itemId } = await req.json();
+  let objId = new ObjectId(itemId)
+
 
   try {
     const client = await clientPromise;
     const db = client.db('menu');
 
-    if (!itemId) {
-      return NextResponse.json({ success: false, error: 'Id is not eixt' }, { status: 400 });
+    if (!objId) {
+      return NextResponse.json({ success: false, error: 'Id is not exist' }, { status: 400 });
     }
 
-    const result: any = await db.collection('menu').updateOne(
-      { type: type }, // Find the document with the specified item in the data array
-      { $pull: { data: { _id: new ObjectId(itemId) } } as any }, // Remove the matching object from the data array
+    const result: any = await db.collection('menu').findOneAndDelete(
+      { _id: objId }
     );
 
     if (result.modifiedCount === 0) {
@@ -54,23 +66,17 @@ export async function DELETE(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
+  const newItem = await req.json();
+  const { updatedType, itemId } = newItem;
   try {
     const client = await clientPromise;
     const db = client.db('menu');
-    const newItem = await req.json();
-    const { type, data } = newItem;
 
-    // Prepare the update object
-    const updateFields: any = {};
-    if (data.name) updateFields['data.$.name'] = data.name;
-    if (data.price) updateFields['data.$.price'] = data.price;
-    if (data.image) updateFields['data.$.image'] = data.image;
-
-    const result = await db.collection('menu').updateOne(
-      { type: type, 'data._id': new ObjectId(data._id) }, // Match the object with the given type and specific item ID
-      {
-        $set: updateFields // Update only the fields present in updateFields
-      }
+    const result: any = await db.collection('menu').findOneAndUpdate(
+      { _id: new ObjectId(itemId) },
+      { $set: { type: updatedType } },
+      { returnDocument: 'after' } // returns the updated document
+   
     );
 
     return NextResponse.json({ success: true, data: result });

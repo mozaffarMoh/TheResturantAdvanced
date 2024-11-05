@@ -41,61 +41,29 @@ const MenuEdit = () => {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [currentId, setCurrentId] = useState(0);
   const [showEditMode, setShowEditMode] = useState(false);
-  const [showAddItem, setShowAddItem] = useState(false);
-  const [errorMessageFile, setErrorMessageFile] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string>('');
   const [currentType, setCurrentType] = useState('');
   const [newType, setNewType] = useState('');
-  const [name, setName] = useState('');
-  const [price, setPrice] = useState(0);
-  const [uploadedFile, setUploadedFile] = useState('');
-
-  const bodyAdd = {
-    type: currentType,
-    data: {
-      _id: currentId,
-      name,
-      price,
-      image: uploadedFile,
-    },
-  };
-
-  const [, loadingAddItem, handleAddItem, successAddItem] = usePost(
-    '/en/api/menu',
-    bodyAdd,
-  );
 
   const [, loadingAddNewType, handleAddNewType, successAddNewType] = usePost(
-    '/en/api/menu-type',
-    { type: newType },
+    '/en/api/types',
+    { newType: newType },
   );
 
   const [, loadingEditItem, handleEditItemProcess, successEditItem] = usePut(
-    '/en/api/menu',
-    bodyAdd,
+    '/en/api/types',
+    { itemId: currentId, updatedType: currentType },
   );
   const [, loadingDeleteItem, handleDeleteItemProcess, successDeleteItem] =
-    useDelete('/en/api/menu', { itemId: currentId, type: currentType });
+    useDelete('/en/api/types', { itemId: currentId });
 
-  const [menuItems, loading, getMenu, success] = useGet('/en/api/menu');
+  const [menuItems, loading, getMenu, success] = useGet('/en/api/types');
 
   useEffect(() => {
     getMenu();
   }, []);
 
   const labels = [t('table.id'), t('table.type'), t('table.actions')];
-
-  const primaryObj = {
-    color: primaryColor,
-    cursor: 'pointer',
-    ':hover': { color: primaryColor + 'cc' },
-  };
-
-  const secondaryObj = {
-    color: secondaryColor,
-    cursor: 'pointer',
-    mx: 1,
-    ':hover': { color: secondaryColor + 'cc' },
-  };
 
   const handleDeleteItem = (id: any) => {
     setShowDeleteConfirmation(true);
@@ -105,33 +73,45 @@ const MenuEdit = () => {
   const handleEditItem = (item: any) => {
     handleCancel();
     setShowEditMode(true);
-    setName(item?.name);
-    setPrice(item?.price);
-    setCurrentId(item?._id);
+    setCurrentType(item?.type);
+    setCurrentId(item?.id);
   };
 
   const handleCancel = () => {
-    setShowAddItem(false);
     setShowEditMode(false);
     setShowDeleteConfirmation(false);
-    setName('');
-    setPrice(0);
     setCurrentType('');
-    setUploadedFile('');
+    setNewType('');
     setCurrentId(0);
   };
 
   useEffect(() => {
-    if (
-      successDeleteItem ||
-      successAddItem ||
-      successEditItem ||
-      successAddNewType
-    ) {
+    if (successDeleteItem || successEditItem || successAddNewType) {
       handleCancel();
       getMenu();
     }
-  }, [successAddItem, successDeleteItem, successEditItem, successAddNewType]);
+  }, [successDeleteItem, successEditItem, successAddNewType]);
+
+  /* Add or edit */
+  const handleProcess = (process: string) => {
+    if (process == 'edit') {
+      !currentId
+        ? setErrorMessage('field should not empty')
+        : handleEditItemProcess;
+    }
+    if (process == 'add') {
+      !newType ? setErrorMessage('field should not empty') : handleAddNewType;
+    }
+  };
+
+  /* empty the error message */
+  useEffect(() => {
+    if (errorMessage) {
+      setTimeout(() => {
+        setErrorMessage('');
+      }, 2000);
+    }
+  }, [errorMessage]);
 
   return (
     <Container>
@@ -143,9 +123,9 @@ const MenuEdit = () => {
         message={t('messages.delete-item')}
       />
       <CustomAlert
-        openAlert={Boolean(errorMessageFile)}
-        setOpenAlert={() => setErrorMessageFile('')}
-        message={errorMessageFile}
+        openAlert={Boolean(errorMessage)}
+        setOpenAlert={() => setErrorMessage('')}
+        message={errorMessage}
       />
 
       <Stack
@@ -190,36 +170,60 @@ const MenuEdit = () => {
                       ))}
                     </TableRow>
                   ))
-                : [{ type: 'Sandwich' }, { type: 'Meals' }].map(
-                    (bill: any, i: number) => {
-                      return (
-                        <TableRow key={bill?.id}>
-                          <TableCell align="center">{i + 1}</TableCell>
-                          <TableCell align="center">{bill?.type}</TableCell>
-                          <TableCell align="center">
-                            <Button
-                              variant="contained"
-                              color="error"
-                              sx={{ bgcolor: secondaryColor, color: 'white' }}
-                            >
-                              {t('buttons.delete')}
-                            </Button>
-                            <Button
-                              variant="contained"
-                              color="warning"
-                              sx={{
-                                bgcolor: primaryColor,
-                                color: 'white',
-                                mx: 1,
+                : menuItems &&
+                  menuItems.map((item: any, i: number) => {
+                    let isEdit = showEditMode && item?.id == currentId;
+                    console.log(currentId, '$$$', item?.id);
+
+                    return (
+                      <TableRow key={item?.id}>
+                        <TableCell align="center">{i + 1}</TableCell>
+                        <TableCell align="center">
+                          {isEdit ? (
+                            <Input
+                              value={currentType}
+                              onChange={(e: any) => {
+                                setCurrentType(e.target.value);
                               }}
-                            >
-                              {t('buttons.edit')}
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    },
-                  )}
+                            />
+                          ) : (
+                            item?.type
+                          )}
+                        </TableCell>
+                        <TableCell align="center">
+                          <Button
+                            variant="contained"
+                            color="error"
+                            sx={{ bgcolor: secondaryColor, color: 'white' }}
+                            onClick={
+                              isEdit
+                                ? handleCancel
+                                : () => handleDeleteItem(item?.id)
+                            }
+                          >
+                            {isEdit ? t('buttons.cancel') : t('buttons.delete')}
+                          </Button>
+                          <LoadingButton
+                            loading={isEdit && loadingEditItem}
+                            variant="contained"
+                            color="warning"
+                            sx={{
+                              bgcolor: primaryColor,
+                              color: 'white',
+                              mx: 1,
+                            }}
+                            onClick={
+                              isEdit
+                                ? () => handleProcess('edit')
+                                : () => handleEditItem(item)
+                            }
+                          >
+                            {isEdit ? t('buttons.confirm') : t('buttons.edit')}
+                          </LoadingButton>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
             </TableBody>
           </Table>
         </TableContainer>
@@ -238,14 +242,19 @@ const MenuEdit = () => {
         >
           {t('labels.add-type')}
         </Typography>
-        <Input />
-        <Button
+        <Input
+          value={newType}
+          onChange={(e: any) => setNewType(e.target.value)}
+        />
+        <LoadingButton
           variant="contained"
           color="error"
           fullWidth
+          loading={loadingAddNewType}
+          onClick={() => handleProcess('add')}
         >
           {t('buttons.add')}
-        </Button>
+        </LoadingButton>
       </Stack>
     </Container>
   );

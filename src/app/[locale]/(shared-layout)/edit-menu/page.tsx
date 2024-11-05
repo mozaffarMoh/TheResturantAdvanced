@@ -278,7 +278,7 @@ const MenuEdit = () => {
                                   }}
                                 />
                               ) : (
-                                row.price
+                                row.price + '$'
                               )}
                             </TableCell>
                             <TableCell align="center">
