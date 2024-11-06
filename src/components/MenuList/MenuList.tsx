@@ -6,7 +6,7 @@ import { Stack, Typography } from '@mui/material';
 import CustomSkeleton from '../skeleton/CustomSkeleton';
 import { usePathname } from 'next/navigation';
 
-const MenuList = () => {
+const MenuList = ({ setBillData, billData }: any) => {
   const pathname = usePathname();
   const langCurrent = pathname?.slice(1, 3) || 'en';
   const [menuItems, loading, getMenu, success] = useGet('/en/api/menu');
@@ -14,6 +14,25 @@ const MenuList = () => {
   useEffect(() => {
     getMenu();
   }, []);
+
+  const handleAddItem = (item: any) => {
+    setBillData((prevArr: any) => {
+      let newArr = [...prevArr];
+      if (!newArr.some((ele) => ele?._id == item?._id)) {
+        newArr.push({ ...item, count: 1 });
+      } else {
+        newArr = newArr.map((ele: any) => {
+          const isExist = ele?._id == item?._id;
+          const count = !isExist ? ele?.count : ele?.count + 1;
+          return {
+            ...ele,
+            count: count,
+          };
+        });
+      }
+      return newArr;
+    });
+  };
 
   return (
     <div className="MenuList">
@@ -60,8 +79,9 @@ const MenuList = () => {
                 {element?.data?.map((item: any) => {
                   return (
                     <div
-                      className="item flexBetweenColumn"
+                      className="item flexCenterColumn"
                       key={item?._id}
+                      onClick={() => handleAddItem(item)}
                     >
                       <img src={item.image} />
                       <div>

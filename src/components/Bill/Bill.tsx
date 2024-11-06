@@ -8,9 +8,12 @@ import React from 'react';
 import Cookies from 'js-cookie';
 import { useTranslations } from 'next-intl';
 import ConfirmationModal from '../ConfirmationModal/ConfirmationModal';
+import { usePathname } from 'next/navigation';
 
-const Bill = () => {
+const Bill = ({ setBillData, billData }: any) => {
   const t = useTranslations();
+  const pathname = usePathname();
+  const langCurrent = pathname?.slice(1, 3) || 'en';
   const [deleteHover, setDeleteHover] = React.useState(false);
   const [minusOneHover, setMinusOneHover] = React.useState(false);
   const [showRemoveCashConfirmation, setShowRemoveCashConfirmation] =
@@ -22,25 +25,27 @@ const Bill = () => {
 
   const columns: any = [
     {
-      title: t('table.num'),
-      dataIndex: 'num',
-      key: 'num',
+      title: t('table.count'),
+      dataIndex: 'count',
+      key: 'count',
     },
     {
       title: t('table.name'),
       dataIndex: 'name',
       key: 'name',
+      render: (name: any) => <p>{name?.[langCurrent]}</p>,
     },
     {
       title: t('table.unit-price'),
-      dataIndex: 'unitPrice',
-      key: 'unitPrice',
+      dataIndex: 'price',
+      key: 'price',
+      render: (unit: number) => <p>{unit}$</p>,
     },
     {
       title: t('table.total-price'),
-      dataIndex: 'unitPrice',
-      key: 'unitPrice',
-      render: (unit: number, item: any) => <p>{unit * item?.num}</p>,
+      dataIndex: 'price',
+      key: 'price',
+      render: (unit: number, item: any) => <p>{unit * item?.count}$</p>,
     },
     {
       title: t('table.actions'),
@@ -51,6 +56,7 @@ const Bill = () => {
               className={`action-area flexCenter ${
                 minusOneHover && index === hoverIndex && 'action-area-hover'
               }`}
+              onClick={() => handleMinusOne(index)}
             >
               <TiDocumentDelete
                 className="minus-one"
@@ -66,6 +72,7 @@ const Bill = () => {
               className={`action-area flexCenter ${
                 deleteHover && index === hoverIndex && 'action-area-hover'
               }`}
+              onClick={() => handleRemoveItem(index)}
             >
               <MdDelete
                 className="remove-item"
@@ -83,15 +90,36 @@ const Bill = () => {
     },
   ];
 
-  let ordersArray: any = [];
   /* Calculate Total Price */
   React.useEffect(() => {
     setTotalPrice(0);
-    for (let i = 0; i < ordersArray.length; i++) {
-      const itemTotal = ordersArray[i].unitPrice * ordersArray[i].num;
+    for (let i = 0; i < billData.length; i++) {
+      const itemTotal = billData?.[i]?.price * billData?.[i]?.count;
       setTotalPrice((prev) => prev + itemTotal);
     }
-  }, [ordersArray]);
+  }, [billData]);
+
+  /* Remove Item */
+  const handleRemoveItem = (index: number) => {
+    setBillData((prevArr: any) => {
+      const newArr = [...prevArr].filter((_, i) => i !== index);
+      return newArr;
+    });
+  };
+
+  const handleMinusOne = (index: number) => {
+    setBillData((prevArr: any) => {
+      let newArr = [...prevArr].map((item, i) => {
+        if (i === index) {
+          return { ...item, count: item?.count - 1 };
+        } else {
+          return item;
+        }
+      });
+      const filterdArray = newArr.filter((item) => item?.count > 0);
+      return filterdArray;
+    });
+  };
 
   /* Remove cash */
   const removeCash = () => {
@@ -114,7 +142,7 @@ const Bill = () => {
     <div className="bill">
       <Table
         className="table-container"
-        dataSource={ordersArray}
+        dataSource={billData}
         columns={columns}
         key={'key'}
         footer={() => (
@@ -124,6 +152,13 @@ const Bill = () => {
           </p>
         )}
         scroll={{ x: 420 }}
+        pagination={{
+          defaultPageSize: 10, // Or whatever your page size is
+      
+          style: {
+            direction: 'ltr', // Ensure LTR pagination direction
+          },
+        }}
       />
 
       <div style={{ position: 'relative' }}>
@@ -150,13 +185,14 @@ const Bill = () => {
         <div className="total-cash flexCenterColumn">
           <p>
             {t('bill.total-cash')} :{' '}
-            {totalCashCookies ? totalCashCookies : totalCash} SYP
+            {totalCashCookies ? totalCashCookies : totalCash} $
           </p>
         </div>
 
         <ConfirmationModal
           open={showRemoveCashConfirmation}
           handleCancel={() => setShowRemoveCashConfirmation(false)}
+          handleConfirm={removeCash}
           message={t('messages.clear-cash')}
         />
       </div>

@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 
 const HomePage: NextPage = () => {
   const [isCsr, setIsCsr] = useState(false);
+  const [billData, setBillData] = useState([]);
 
   useEffect(() => {
     setIsCsr(true);
@@ -18,9 +19,16 @@ const HomePage: NextPage = () => {
         alignItems={'center'}
         direction={'row'}
         flexWrap={'wrap'}
+        paddingY={2}
       >
-        <MenuList />
-        <Bill />
+        <MenuList
+          setBillData={setBillData}
+          billData={billData}
+        />
+        <Bill
+          setBillData={setBillData}
+          billData={billData}
+        />
       </Stack>
     </Container>
   ) : (
