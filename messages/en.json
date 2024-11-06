@@ -10,6 +10,10 @@
         "total-price": "Total Price",
         "unit-price": "Unit Price",
         "name": "Name",
+        "nameAR": "Name in Arabic",
+        "nameEN": "Name in English",
+        "typeAR": "Type in Arabic",
+        "typeEN": "Type in English",
         "num": "Num",
         "id": "ID",
         "price": "Price",
@@ -54,8 +58,8 @@
         "successAdd": "Added successfully",
         "successDelete": "Delete successfully",
         "successEdit": "Edit successfully",
-        "errorDeleteId" : "Id is not exist",
-        "errorDeleteNotFound" : "'Item not found or already deleted'",
+        "errorDeleteId": "Id is not exist",
+        "errorDeleteNotFound": "'Item not found or already deleted'",
         "error": "Unexpected Error"
     }
 }

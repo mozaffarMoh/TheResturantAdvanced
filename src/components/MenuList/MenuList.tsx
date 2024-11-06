@@ -3,11 +3,12 @@ import useGet from '@/custom-hooks/useGet';
 import './MenuList.scss';
 import { useEffect } from 'react';
 import { Stack, Typography } from '@mui/material';
-import { menu } from '@/app/[locale]/(shared-layout)/edit-menu/menuArr';
-import { Skeleton } from 'antd';
 import CustomSkeleton from '../skeleton/CustomSkeleton';
+import { usePathname } from 'next/navigation';
 
 const MenuList = () => {
+  const pathname = usePathname();
+  const langCurrent = pathname?.slice(1, 3) || 'en';
   const [menuItems, loading, getMenu, success] = useGet('/en/api/menu');
 
   useEffect(() => {
@@ -23,7 +24,7 @@ const MenuList = () => {
         >
           {Array.from(new Array(3)).map((_, index) => (
             <Stack key={index}>
-              <CustomSkeleton width={200}/>
+              <CustomSkeleton width={200} />
               <Stack
                 direction={'row'}
                 padding={2}
@@ -53,7 +54,7 @@ const MenuList = () => {
                 color="GrayText"
                 fontWeight={600}
               >
-                {element?.type}
+                {element?.type?.[langCurrent]}
               </Typography>
               <div className="items-template flexStart">
                 {element?.data?.map((item: any) => {
@@ -64,7 +65,7 @@ const MenuList = () => {
                     >
                       <img src={item.image} />
                       <div>
-                        <p>{item.name}</p>
+                        <p>{item.name?.[langCurrent]}</p>
                         <p>{item.price}$</p>
                       </div>
                     </div>

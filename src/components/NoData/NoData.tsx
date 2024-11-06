@@ -1,4 +1,4 @@
-import { primaryColor } from '@/constant/color';
+import { fourthColor, primaryColor, secondaryColor } from '@/constant/color';
 import { Stack, Typography } from '@mui/material';
 import { useTranslations } from 'next-intl';
 
@@ -12,7 +12,7 @@ const NoData = () => {
       justifyContent={'center'}
     >
       <Typography
-        color={primaryColor}
+        color={fourthColor}
         fontSize={30}
       >
         {t('messages.no-data')}

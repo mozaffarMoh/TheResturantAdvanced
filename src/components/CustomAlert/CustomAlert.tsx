@@ -1,3 +1,4 @@
+import { secondaryColor, thirdColor } from '@/constant/color';
 import { Alert, Snackbar, SnackbarOrigin, Typography } from '@mui/material';
 import Cookies from 'js-cookie';
 import { usePathname } from 'next/navigation';
@@ -39,6 +40,7 @@ const CustomAlert = ({
           justifyContent: 'center',
           alignItems: 'center',
           gap: '10px',
+          background: type == 'success' ? thirdColor : '',
           direction: reverseDirection,
         }}
       >

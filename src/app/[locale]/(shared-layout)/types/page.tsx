@@ -15,25 +15,26 @@ import {
 import { Typography, Button } from '@mui/material';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
-import {
-  primaryColor,
-  secondaryColor,
-} from '@/constant/color';
+import { primaryColor, secondaryColor } from '@/constant/color';
 import { ConfirmationModal, CustomAlert } from '@/components';
 import { Input } from 'antd';
 import { LoadingButton } from '@mui/lab';
 import usePost from '@/custom-hooks/usePost';
 import useDelete from '@/custom-hooks/useDelete';
 import usePut from '@/custom-hooks/usePut';
+import { usePathname } from 'next/navigation';
+import NoData from '@/components/NoData/NoData';
 
 const MenuEdit = () => {
   const t = useTranslations();
+  const pathname = usePathname();
+  const langCurrent = pathname?.slice(1, 3) || 'en';
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [currentId, setCurrentId] = useState(0);
   const [showEditMode, setShowEditMode] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
-  const [currentType, setCurrentType] = useState('');
-  const [newType, setNewType] = useState('');
+  const [currentTypeObj, setCurrentTypeObj] = useState({ en: '', ar: '' });
+  const [newTypeObj, setNewTypeObj] = useState({ en: '', ar: '' });
 
   const [
     ,
@@ -42,7 +43,7 @@ const MenuEdit = () => {
     successAddNewType,
     successAddNewTypeMessage,
     errorAddNewTypeMessage,
-  ] = usePost('/en/api/types', { newType: newType });
+  ] = usePost('/en/api/types', { newType: newTypeObj });
 
   const [
     ,
@@ -51,7 +52,10 @@ const MenuEdit = () => {
     successEditType,
     successEditTypeMessage,
     errorEditTypeMessage,
-  ] = usePut('/en/api/types', { itemId: currentId, updatedType: currentType });
+  ] = usePut('/en/api/types', {
+    itemId: currentId,
+    updatedType: currentTypeObj,
+  });
   const [
     ,
     loadingDeleteType,
@@ -67,7 +71,12 @@ const MenuEdit = () => {
     getMenu();
   }, []);
 
-  const labels = [t('table.id'), t('table.type'), t('table.actions')];
+  const labels = [
+    t('table.id'),
+    t('table.typeAR'),
+    t('table.typeEN'),
+    t('table.actions'),
+  ];
 
   const handleDeleteItem = (id: any) => {
     setShowDeleteConfirmation(true);
@@ -77,15 +86,15 @@ const MenuEdit = () => {
   const handleEditItem = (item: any) => {
     handleCancel();
     setShowEditMode(true);
-    setCurrentType(item?.type);
+    setCurrentTypeObj({ en: item?.type?.en, ar: item?.type?.ar });
     setCurrentId(item?.id);
   };
 
   const handleCancel = () => {
     setShowEditMode(false);
     setShowDeleteConfirmation(false);
-    setCurrentType('');
-    setNewType('');
+    setCurrentTypeObj({ en: '', ar: '' });
+    setNewTypeObj({ en: '', ar: '' });
     setCurrentId(0);
   };
 
@@ -99,12 +108,14 @@ const MenuEdit = () => {
   /* Add or edit */
   const handleProcess = (process: string) => {
     if (process == 'edit') {
-      !currentType
+      !currentTypeObj?.ar || !currentTypeObj?.en
         ? setErrorMessage(t('messages.not-empty'))
         : handleEditTypeProcess();
     }
     if (process == 'add') {
-      !newType ? setErrorMessage(t('messages.not-empty')) : handleAddNewType();
+      !newTypeObj?.ar || !newTypeObj?.en
+        ? setErrorMessage(t('messages.not-empty'))
+        : handleAddNewType();
     }
   };
 
@@ -193,7 +204,7 @@ const MenuEdit = () => {
                 ? // Render Skeletons when loading
                   Array.from(new Array(4)).map((_, index) => (
                     <TableRow key={index}>
-                      {Array.from(new Array(3)).map((_, index) => (
+                      {Array.from(new Array(4)).map((_, index) => (
                         <TableCell>
                           <Skeleton variant="text" />
                         </TableCell>
@@ -210,13 +221,35 @@ const MenuEdit = () => {
                         <TableCell align="center">
                           {isEdit ? (
                             <Input
-                              value={currentType}
+                              value={currentTypeObj?.ar}
                               onChange={(e: any) => {
-                                setCurrentType(e.target.value);
+                                setCurrentTypeObj((prev: any) => {
+                                  return {
+                                    ...prev,
+                                    ar: e.target.value,
+                                  };
+                                });
                               }}
                             />
                           ) : (
-                            item?.type
+                            item?.type?.ar
+                          )}
+                        </TableCell>
+                        <TableCell align="center">
+                          {isEdit ? (
+                            <Input
+                              value={currentTypeObj?.en}
+                              onChange={(e: any) => {
+                                setCurrentTypeObj((prev: any) => {
+                                  return {
+                                    ...prev,
+                                    en: e.target.value,
+                                  };
+                                });
+                              }}
+                            />
+                          ) : (
+                            item?.type?.en
                           )}
                         </TableCell>
                         <TableCell align="center">
@@ -255,6 +288,7 @@ const MenuEdit = () => {
                   })}
             </TableBody>
           </Table>
+          {success && menuItems.length == 0 && <NoData />}
         </TableContainer>
       </Stack>
 
@@ -272,8 +306,28 @@ const MenuEdit = () => {
           {t('labels.add-type')}
         </Typography>
         <Input
-          value={newType}
-          onChange={(e: any) => setNewType(e.target.value)}
+          value={newTypeObj?.ar}
+          placeholder={t('table.typeAR')}
+          onChange={(e: any) =>
+            setNewTypeObj((prev: any) => {
+              return {
+                ...prev,
+                ar: e.target.value,
+              };
+            })
+          }
+        />
+        <Input
+          value={newTypeObj?.en}
+          placeholder={t('table.typeEN')}
+          onChange={(e: any) =>
+            setNewTypeObj((prev: any) => {
+              return {
+                ...prev,
+                en: e.target.value,
+              };
+            })
+          }
         />
         <LoadingButton
           variant="contained"

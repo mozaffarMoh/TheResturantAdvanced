@@ -30,16 +30,20 @@ import { LoadingButton } from '@mui/lab';
 import usePost from '@/custom-hooks/usePost';
 import useDelete from '@/custom-hooks/useDelete';
 import usePut from '@/custom-hooks/usePut';
+import { usePathname } from 'next/navigation';
+import NoData from '@/components/NoData/NoData';
 
 const MenuEdit = () => {
   const t = useTranslations();
+  const pathname = usePathname();
+  const langCurrent = pathname?.slice(1, 3) || 'en';
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [currentId, setCurrentId] = useState(0);
   const [showEditMode, setShowEditMode] = useState(false);
   const [showAddItem, setShowAddItem] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [currentType, setCurrentType] = useState('');
-  const [name, setName] = useState('');
+  const [nameObj, setNameObj]: any = useState({ en: '', ar: '' });
   const [price, setPrice] = useState(0);
   const [uploadedFile, setUploadedFile] = useState('');
 
@@ -47,7 +51,7 @@ const MenuEdit = () => {
     type: currentType,
     data: {
       _id: currentId,
-      name,
+      name: nameObj,
       price,
       image: uploadedFile,
     },
@@ -78,7 +82,7 @@ const MenuEdit = () => {
     errorDeleteItemMessage,
   ] = useDelete('/en/api/menu', { itemId: currentId, type: currentType });
 
-  const [menuItems, loading, getMenu] = useGet('/en/api/menu');
+  const [menuItems, loading, getMenu, success] = useGet('/en/api/menu');
 
   useEffect(() => {
     getMenu();
@@ -86,7 +90,8 @@ const MenuEdit = () => {
 
   const labels = [
     t('table.id'),
-    t('table.name'),
+    t('table.nameAR'),
+    t('table.nameEN'),
     t('table.price'),
     t('table.image'),
     t('table.actions'),
@@ -113,7 +118,10 @@ const MenuEdit = () => {
   const handleEditItem = (item: any) => {
     handleCancel();
     setShowEditMode(true);
-    setName(item?.name);
+    setNameObj({
+      ar: item?.name?.ar,
+      en: item?.name?.en,
+    });
     setPrice(item?.price);
     setCurrentId(item?._id);
   };
@@ -122,7 +130,7 @@ const MenuEdit = () => {
     setShowAddItem(false);
     setShowEditMode(false);
     setShowDeleteConfirmation(false);
-    setName('');
+    setNameObj({ en: '', ar: '' });
     setPrice(0);
     setCurrentType('');
     setUploadedFile('');
@@ -172,7 +180,7 @@ const MenuEdit = () => {
 
   /* Add or edit */
   const handleProcess = (process: string) => {
-    if (!name) {
+    if (!nameObj?.en || !nameObj?.ar) {
       setErrorMessage(t('messages.not-empty'));
       return;
     }
@@ -198,7 +206,7 @@ const MenuEdit = () => {
         loading={loadingDeleteItem}
         message={t('messages.delete-item')}
       />
-   <CustomAlert
+      <CustomAlert
         openAlert={
           Boolean(errorMessage) ||
           Boolean(errorDeleteItemMessage) ||
@@ -245,7 +253,7 @@ const MenuEdit = () => {
           <Table sx={{ mt: 3 }}>
             {Array.from(new Array(5)).map((_, index) => (
               <TableRow key={index}>
-                {Array.from(new Array(5)).map((_, index) => (
+                {Array.from(new Array(6)).map((_, index) => (
                   <TableCell>
                     <Skeleton variant="text" />
                   </TableCell>
@@ -268,7 +276,7 @@ const MenuEdit = () => {
                   color={fourthColor}
                   fontWeight={600}
                 >
-                  {element?.type}
+                  {element?.type?.[langCurrent]}
                 </Typography>
                 <TableContainer
                   sx={{ width: '100%' }}
@@ -311,13 +319,35 @@ const MenuEdit = () => {
                             <TableCell align="center">
                               {isEdit ? (
                                 <Input
-                                  value={name}
+                                  value={nameObj?.ar}
                                   onChange={(e: any) => {
-                                    setName(e.target.value);
+                                    setNameObj((prev: any) => {
+                                      return {
+                                        ...prev,
+                                        ar: e.target.value,
+                                      };
+                                    });
                                   }}
                                 />
                               ) : (
-                                row.name
+                                row?.name?.ar
+                              )}
+                            </TableCell>
+                            <TableCell align="center">
+                              {isEdit ? (
+                                <Input
+                                  value={nameObj?.en}
+                                  onChange={(e: any) => {
+                                    setNameObj((prev: any) => {
+                                      return {
+                                        ...prev,
+                                        en: e.target.value,
+                                      };
+                                    });
+                                  }}
+                                />
+                              ) : (
+                                row?.name?.en
                               )}
                             </TableCell>
                             <TableCell align="center">
@@ -423,9 +453,27 @@ const MenuEdit = () => {
                           <TableCell align="center">#</TableCell>
                           <TableCell align="center">
                             <Input
-                              value={name}
+                              value={nameObj?.ar}
                               onChange={(e: any) => {
-                                setName(e.target.value);
+                                setNameObj((prev: any) => {
+                                  return {
+                                    ...prev,
+                                    ar: e.target.value,
+                                  };
+                                });
+                              }}
+                            />
+                          </TableCell>
+                          <TableCell align="center">
+                            <Input
+                              value={nameObj?.en}
+                              onChange={(e: any) => {
+                                setNameObj((prev: any) => {
+                                  return {
+                                    ...prev,
+                                    en: e.target.value,
+                                  };
+                                });
                               }}
                             />
                           </TableCell>
@@ -517,6 +565,7 @@ const MenuEdit = () => {
           })
         )}
       </Stack>
+      {success && menuItems.length == 0 && <NoData />}
     </Container>
   );
 };
