@@ -15,6 +15,10 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const acceptLanguage = req.headers.get('accept-language') || 'en';
+  const language = acceptLanguage?.split(',')?.[0]?.split('-')?.[0];
+
+  const messages = await import(`../../../../../messages/${language}.json`).catch(() => import('../../../../../messages/en.json'));
 
   try {
     const client = await clientPromise;
@@ -30,13 +34,18 @@ export async function POST(req: NextRequest) {
       { upsert: true } // If type doesn't exist, create a new object
     );
 
-    return NextResponse.json({ success: true, message: 'Item has been added successfuly' });
+    return NextResponse.json({ success: true, message: messages.apiMessages.successAdd  });
   } catch (error) {
-    return NextResponse.json({ success: false, message: 'Failed to add item' }, { status: 500 });
+    return NextResponse.json({ success: false, message: messages.apiMessages.error }, { status: 500 });
   }
 }
 
 export async function DELETE(req: NextRequest) {
+  const acceptLanguage = req.headers.get('accept-language') || 'en';
+  const language = acceptLanguage?.split(',')?.[0]?.split('-')?.[0];
+
+  const messages = await import(`../../../../../messages/${language}.json`).catch(() => import('../../../../../messages/en.json'));
+
   const { itemId, type } = await req.json();
 
   try {
@@ -44,7 +53,7 @@ export async function DELETE(req: NextRequest) {
     const db = client.db('menu');
 
     if (!itemId) {
-      return NextResponse.json({ success: false, message: 'Item is not eixt' }, { status: 400 });
+      return NextResponse.json({ success: false, message: messages.apiMessages.errorDeleteId }, { status: 400 });
     }
 
     const result: any = await db.collection('menu').updateOne(
@@ -55,19 +64,24 @@ export async function DELETE(req: NextRequest) {
     if (result.modifiedCount === 0) {
       return NextResponse.json({
         success: false,
-        message: 'Item not found or already deleted',
+        message: messages.apiMessages.errorDeleteNotFound,
       }, { status: 404 }
       );
     }
 
-    return NextResponse.json({ success: true, message: 'Item deleted successfully' });
+    return NextResponse.json({ success: true, message: messages.apiMessages.successDelete  });
   } catch (error) {
     console.error('Error deleting item:', error);
-    return NextResponse.json({ success: false, message: 'Failed to delete item' }, { status: 500 });
+    return NextResponse.json({ success: false, message:messages.apiMessages.error  }, { status: 500 });
   }
 }
 
 export async function PUT(req: NextRequest) {
+  const acceptLanguage = req.headers.get('accept-language') || 'en';
+  const language = acceptLanguage?.split(',')?.[0]?.split('-')?.[0];
+
+  const messages = await import(`../../../../../messages/${language}.json`).catch(() => import('../../../../../messages/en.json'));
+
   try {
     const client = await clientPromise;
     const db = client.db('menu');
@@ -87,8 +101,8 @@ export async function PUT(req: NextRequest) {
       }
     );
 
-    return NextResponse.json({ success: true, message: 'Update type success' });
+    return NextResponse.json({ success: true, message: messages.apiMessages.successEdit });
   } catch (error) {
-    return NextResponse.json({ success: false, message: 'Failed to update item' }, { status: 500 });
+    return NextResponse.json({ success: false, message:  messages.apiMessages.error  }, { status: 500 });
   }
 }

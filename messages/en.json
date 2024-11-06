@@ -14,7 +14,7 @@
         "id": "ID",
         "price": "Price",
         "image": "Image",
-        "type":"Type"
+        "type": "Type"
     },
     "bill": {
         "print": "Print",
@@ -36,8 +36,8 @@
         "add": "Add",
         "show-details": "Show Details",
         "back": "Back",
-        "delete":"Delete",
-        "edit":"Edit"
+        "delete": "Delete",
+        "edit": "Edit"
     },
     "messages": {
         "clear-cash": "Are you sure you want to clear all cash",
@@ -45,9 +45,17 @@
         "no-data": "No Data",
         "image-type-error": "file type is not supported",
         "image-max-size-error": "Image should be 1MB or less",
-        "not-empty":"Value shuold not be empty"
+        "not-empty": "Value shuold not be empty"
     },
     "labels": {
         "add-type": "Add Type"
+    },
+    "apiMessages": {
+        "successAdd": "Added successfully",
+        "successDelete": "Delete successfully",
+        "successEdit": "Edit successfully",
+        "errorDeleteId" : "Id is not exist",
+        "errorDeleteNotFound" : "'Item not found or already deleted'",
+        "error": "Unexpected Error"
     }
 }

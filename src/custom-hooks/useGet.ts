@@ -5,6 +5,11 @@ import axios from "axios";
 
 const useGet = (endPoint: string): any => {
     const pathname = usePathname();
+    const langCurrent = pathname?.slice(1, 3) || 'en';
+    const headers = {
+        'Content-Type': 'application/json',
+        'Accept-Language': langCurrent || 'en', // Set the Accept-Language header
+    }
     const [data, setData] = useState<any>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [success, setSuccess] = useState<boolean>(false);
@@ -17,7 +22,7 @@ const useGet = (endPoint: string): any => {
         setSuccess(false);
         setLoading(true);
         axios
-            .get(endPoint)
+            .get(endPoint,{headers})
             .then((res: any) => {
                 setSuccess(true);
                 setLoading(false);
