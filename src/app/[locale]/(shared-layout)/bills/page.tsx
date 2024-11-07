@@ -87,11 +87,11 @@ const MyBills = () => {
     );
   };
 
-  const handleDeleteItem = (id: any) => {
-    setShowDeleteConfirmation(true);
+  const handleDeleteItem = () => {
+    if (selectedBills?.length > 0) {
+      setShowDeleteConfirmation(true);
+    }
   };
-
-  console.log(selectedBills);
 
   useEffect(() => {
     if (successDeleteBill) {
@@ -129,7 +129,7 @@ const MyBills = () => {
         handleCancel={() => setShowDeleteConfirmation(false)}
         handleConfirm={handleDeleteBillProcess}
         loading={loadingDeleteBill}
-        message={t('messages.delete-item')}
+        message={t('messages.delete-bills')}
       />
       <BillModal
         open={showBillDetails}
@@ -150,14 +150,6 @@ const MyBills = () => {
           </Typography>
         </Stack>
 
-        <Button
-          variant="contained"
-          color="error"
-          sx={{ bgcolor: secondaryColor, color: 'white', width: 200 }}
-          onClick={handleDeleteItem}
-        >
-          {t('buttons.delete-selected')}
-        </Button>
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -230,41 +222,14 @@ const MyBills = () => {
           {successBills && bills?.length == 0 && <NoData />}
         </TableContainer>
 
-        {/*      {success && data && data.length == 0 && <NoData />}
-        {data && data.length > 0 && (
-          <Stack
-            alignItems={'center'}
-            paddingBottom={10}
-          >
-            <Pagination
-              page={page}
-              count={total}
-              onChange={handleChange}
-              siblingCount={2} // Number of siblings to show around the current page
-              renderItem={(item) => (
-                <PaginationItem
-                  {...item}
-                  sx={{
-                    color: '#3F485E',
-                    '&.Mui-selected': {
-                      backgroundColor: '#3F485E',
-                      color: '#fff',
-                      '&:hover': { backgroundColor: '#3F485EDD' },
-                    },
-                  }}
-                  slots={{
-                    previous: isArabic
-                      ? ArrowForwardIosRounded
-                      : ArrowBackIosNewRounded,
-                    next: isArabic
-                      ? ArrowBackIosNewRounded
-                      : ArrowForwardIosRounded,
-                  }}
-                />
-              )}
-            />
-          </Stack>
-        )} */}
+        <Button
+          variant="contained"
+          color="error"
+          sx={{ bgcolor: secondaryColor, color: 'white', width: 200 }}
+          onClick={handleDeleteItem}
+        >
+          {t('buttons.delete-selected')}
+        </Button>
       </Stack>
     </Container>
   );

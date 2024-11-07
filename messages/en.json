@@ -42,7 +42,7 @@
         "show-details": "Show Details",
         "back": "Back",
         "delete": "Delete",
-        "delete-selected" : "Delete Selected",
+        "delete-selected": "Delete Selected",
         "edit": "Edit"
     },
     "labels": {
@@ -50,8 +50,9 @@
         "password": "Password"
     },
     "messages": {
-        "clear-cash": "Are you sure you want to clear all cash",
-        "delete-item": "Are you sure you want to delete this item",
+        "clear-cash": "Are you sure you want to clear all cash ?",
+        "delete-item": "Are you sure you want to delete this item ?",
+        "delete-bills": "Are you sure you want to delete these bills ?",
         "no-data": "No Data",
         "image-type-error": "file type is not supported",
         "image-max-size-error": "Image should be 1MB or less",
