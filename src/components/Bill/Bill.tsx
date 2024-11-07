@@ -15,6 +15,7 @@ import usePost from '@/custom-hooks/usePost';
 import useGet from '@/custom-hooks/useGet';
 import CustomSkeleton from '../skeleton/CustomSkeleton';
 import CustomAlert from '../CustomAlert/CustomAlert';
+import PasswordModal from '../PasswordModal/PasswordModal';
 
 const Bill = ({ setBillData, billData }: any) => {
   const t = useTranslations();
@@ -22,11 +23,13 @@ const Bill = ({ setBillData, billData }: any) => {
   const langCurrent = pathname?.slice(1, 3) || 'en';
   const [deleteHover, setDeleteHover] = React.useState(false);
   const [minusOneHover, setMinusOneHover] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState('');
   const [showRemoveCashConfirmation, setShowRemoveCashConfirmation] =
     React.useState(false);
   const [hoverIndex, setHoverIndex] = React.useState(0);
   const [totalPrice, setTotalPrice] = React.useState(0);
   const [billPayload, setBillPayload]: any = React.useState(null);
+  const [isPrinted, setIsPrinted]: any = React.useState(false);
 
   const [
     ,
@@ -52,12 +55,6 @@ const Bill = ({ setBillData, billData }: any) => {
   useEffect(() => {
     handleGetTotalCash();
   }, []);
-
-  useEffect(() => {
-    if (billPayload && billData?.length > 0) {
-      handleAddBill();
-    }
-  }, [billPayload]);
 
   const columns: any = [
     {
@@ -157,7 +154,7 @@ const Bill = ({ setBillData, billData }: any) => {
     });
   };
 
-  const addBill = () => {
+  const addBillToPayload = () => {
     /* remove images from payload */
     let dataWithoutImages = billData.map((item: any) => {
       delete item?.image;
@@ -171,26 +168,69 @@ const Bill = ({ setBillData, billData }: any) => {
         total: totalPrice,
       },
     };
+
     setBillPayload(bills);
   };
 
   useEffect(() => {
+    if (isPrinted) {
+      handleAddBill();
+      setIsPrinted(false);
+    }
+  }, [isPrinted]);
+
+  const handlePrint = () => {
+    if (billData?.length > 0) {
+      addBillToPayload();
+      window.print();
+    }
+  };
+
+  /* add bill after Print */
+  useEffect(() => {
+    const handleAfterPrint = () => {
+      setIsPrinted(true);
+    };
+
+    if (typeof window !== 'undefined' && window.addEventListener) {
+      window.addEventListener('afterprint', handleAfterPrint);
+
+      return () => {
+        window.removeEventListener('afterprint', handleAfterPrint);
+      };
+    }
+  }, [billPayload]);
+
+  useEffect(() => {
     if (successAddBill || successClearTotalCash) {
       setBillPayload(null);
+      setTotalPrice(0);
       setBillData([]);
       handleGetTotalCash();
       setShowRemoveCashConfirmation(false);
     }
   }, [successAddBill, successClearTotalCash]);
 
+  useEffect(() => {
+    if (errorMessage) {
+      setTimeout(() => {
+        setErrorMessage('');
+      }, 3000);
+    }
+  }, [errorMessage]);
+
   return (
     <div className="bill">
       <CustomAlert
         openAlert={
-          Boolean(errorClearTotalCashMessage) || Boolean(errorAddBillMessage)
+          Boolean(errorClearTotalCashMessage) ||
+          Boolean(errorAddBillMessage) ||
+          Boolean(errorMessage)
         }
-        setOpenAlert={() => {}}
-        message={errorClearTotalCashMessage || errorAddBillMessage}
+        setOpenAlert={() => setErrorMessage('')}
+        message={
+          errorClearTotalCashMessage || errorAddBillMessage || errorMessage
+        }
       />
       <CustomAlert
         openAlert={
@@ -201,12 +241,12 @@ const Bill = ({ setBillData, billData }: any) => {
         setOpenAlert={() => {}}
         message={successClearTotalCashMessage || successAddBillMessage}
       />
-      <ConfirmationModal
+      <PasswordModal
         open={showRemoveCashConfirmation}
         loading={loadingClearTotalCash}
         handleCancel={() => setShowRemoveCashConfirmation(false)}
         handleConfirm={handleClearTotalCash}
-        message={t('messages.clear-cash')}
+        setErrorMessage={setErrorMessage}
       />
       <Table
         className="table-container"
@@ -234,13 +274,23 @@ const Bill = ({ setBillData, billData }: any) => {
 
       <div style={{ position: 'relative' }}>
         <button
-          className="print-button flexCenterColumn"
-          onClick={() => window.print()}
+          className={`print-button ${billData?.length == 0 ? 'print-disabled' : ''} flexCenterColumn`}
+          onClick={handlePrint}
         >
-          <p>{t('bill.print')}</p>
-          <FcPrint className="print-logo" />
+          {loadingAddBill ? (
+            <CircularProgress
+              color="error"
+              size={40}
+              sx={{ m: 1.5 }}
+            />
+          ) : (
+            <>
+              <p>{t('bill.print')}</p>
+              <FcPrint className="print-logo" />
+            </>
+          )}
         </button>
-        <button
+        {/*     <button
           className="add-to-cash"
           onClick={addBill}
         >
@@ -253,7 +303,7 @@ const Bill = ({ setBillData, billData }: any) => {
           ) : (
             <p>{t('bill.add-to-cash')}</p>
           )}
-        </button>
+        </button> */}
         <button
           className="add-to-cash"
           onClick={() => setShowRemoveCashConfirmation(true)}

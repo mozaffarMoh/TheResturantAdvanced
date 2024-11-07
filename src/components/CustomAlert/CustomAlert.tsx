@@ -20,10 +20,11 @@ const CustomAlert = ({
   const pathname = usePathname();
   const langCurrent = pathname?.slice(1, 3) || 'en';
   const reverseDirection = langCurrent == 'en' ? 'rtl' : 'ltr';
+  const horizontalDirection = langCurrent == 'ar' ? 'right' : 'left';
 
   return (
     <Snackbar
-      anchorOrigin={position}
+      anchorOrigin={{ vertical: 'top', horizontal: horizontalDirection }}
       open={openAlert}
       onClose={() => setOpenAlert(false)}
       autoHideDuration={6000}

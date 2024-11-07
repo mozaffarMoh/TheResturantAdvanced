@@ -31,7 +31,8 @@
         "total": "إجمالي الفاتورة",
         "date": "التاريخ",
         "time": "الوقت",
-        "details": "التفاصيل"
+        "details": "التفاصيل",
+        "select": "تحديد"
     },
     "buttons": {
         "confirm": "تأكيد",
@@ -41,7 +42,12 @@
         "show-details": "عرض التفاصيل",
         "back": "العودة",
         "delete": "حذف",
+        "delete-selected": "حذف المحدد",
         "edit": "تعديل"
+    },
+    "labels": {
+        "add-type": "إضافة نوع",
+        "password": "كلمة المرور"
     },
     "messages": {
         "clear-cash": "هل أنت متأكد أنك تريد مسح النقد",
@@ -49,10 +55,8 @@
         "no-data": "لا توجد بيانات",
         "image-type-error": "نوع الملف غير مدعوم",
         "image-max-size-error": "يجب أن تكون الصورة 1 ميجابايت أو أقل",
-        "not-empty": "يجب أن لا تكون القيمة فارغة"
-    },
-    "labels": {
-        "add-type": "إضافة نوع"
+        "not-empty": "يجب أن لا تكون القيمة فارغة",
+        "password-confirm": "الرجاء ادخال كلمة المرور للمسح !!"
     },
     "apiMessages": {
         "successAdd": "تمت الإضافة بنجاح",
@@ -61,6 +65,8 @@
         "errorDeleteId": "المعرف غير موجود",
         "errorDeleteNotFound": "العنصر غير موجود أو تم حذفه مسبقًا",
         "error": "هنالك خطأ ما",
-        "successClearCash": "تم مسح النقد بنجاح"
+        "successClearCash": "تم مسح النقد بنجاح",
+        "billIsEmpty": "الفاتورة فارغة",
+        "incorrectPasswrod": "كلمة المرور غير صحيحة !!"
     }
 }

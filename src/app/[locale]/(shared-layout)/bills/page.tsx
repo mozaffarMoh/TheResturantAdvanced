@@ -7,6 +7,7 @@ import {
 } from '@/constant/color';
 import {
   Button,
+  Checkbox,
   Container,
   Pagination,
   PaginationItem,
@@ -28,6 +29,7 @@ import useGet from '@/custom-hooks/useGet';
 import {
   ArrowBackIosNewRounded,
   ArrowForwardIosRounded,
+  CheckBox,
 } from '@mui/icons-material';
 import { usePathname } from 'next/navigation';
 import usePost from '@/custom-hooks/usePost';
@@ -35,7 +37,7 @@ import NoData from '@/components/NoData/NoData';
 import { BillModal, ConfirmationModal, CustomAlert } from '@/components';
 import useDelete from '@/custom-hooks/useDelete';
 
-const MyActivity = () => {
+const MyBills = () => {
   const t = useTranslations();
   const pathname = usePathname();
   let isArabic = pathname.startsWith('/ar');
@@ -46,9 +48,10 @@ const MyActivity = () => {
   const [billDetails, setBillDetails] = useState({});
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [currentId, setCurrentId] = useState(0);
+  const [selectedBills, setSelectedBills] = useState<string[]>([]);
 
   const labels = [
-    t('my-bills.id'),
+    t('my-bills.select'),
     t('my-bills.total'),
     t('my-bills.date'),
     t('my-bills.time'),
@@ -59,14 +62,15 @@ const MyActivity = () => {
 
   const [
     ,
-    loadingDeleteType,
-    handleDeleteTypeProcess,
-    successDeleteType,
-    successDeleteTypeMessage,
-    errorDeleteTypeMessage,
-  ] = useDelete('/en/api/bills', { itemId: currentId });
+    loadingDeleteBill,
+    handleDeleteBillProcess,
+    successDeleteBill,
+    successDeleteBillMessage,
+    errorDeleteBillMessage,
+  ] = useDelete('/en/api/bills', { billsIDs: selectedBills });
 
   useEffect(() => {
+    setSelectedBills([]);
     getBills();
     setIsClientSide(true);
   }, []);
@@ -75,44 +79,31 @@ const MyActivity = () => {
     setPage(value);
   };
 
-  const handleDeleteItem = (id: any) => {
-    setShowDeleteConfirmation(true);
-    setCurrentId(id);
+  const handleSelectBill = (id: string) => {
+    setSelectedBills((prev) =>
+      prev.includes(id)
+        ? prev.filter((billId) => billId !== id)
+        : [...prev, id],
+    );
   };
 
+  const handleDeleteItem = (id: any) => {
+    setShowDeleteConfirmation(true);
+  };
+
+  console.log(selectedBills);
+
   useEffect(() => {
-    if (successDeleteType) {
+    if (successDeleteBill) {
       setShowDeleteConfirmation(false);
       setCurrentId(0);
       getBills();
+      setSelectedBills([]);
     }
-  }, [successDeleteType]);
+  }, [successDeleteBill]);
 
   return (
     <Container maxWidth="lg">
-      <CustomAlert
-        openAlert={Boolean(errorDeleteTypeMessage)}
-        setOpenAlert={() => {}}
-        message={errorDeleteTypeMessage}
-      />
-      <CustomAlert
-        openAlert={Boolean(successDeleteTypeMessage)}
-        type="success"
-        setOpenAlert={() => {}}
-        message={successDeleteTypeMessage}
-      />
-      <ConfirmationModal
-        open={showDeleteConfirmation}
-        handleCancel={() => setShowDeleteConfirmation(false)}
-        handleConfirm={handleDeleteTypeProcess}
-        loading={loadingDeleteType}
-        message={t('messages.delete-item')}
-      />
-      <BillModal
-        open={showBillDetails}
-        handleCancel={() => setShowBillDetails(false)}
-        data={billDetails || {}}
-      />{' '}
       {isClientSide && (
         <head>
           <title>{t('header.bills')}</title>
@@ -122,6 +113,29 @@ const MyActivity = () => {
           />
         </head>
       )}{' '}
+      <CustomAlert
+        openAlert={Boolean(errorDeleteBillMessage)}
+        setOpenAlert={() => {}}
+        message={errorDeleteBillMessage}
+      />
+      <CustomAlert
+        openAlert={Boolean(successDeleteBillMessage)}
+        type="success"
+        setOpenAlert={() => {}}
+        message={successDeleteBillMessage}
+      />
+      <ConfirmationModal
+        open={showDeleteConfirmation}
+        handleCancel={() => setShowDeleteConfirmation(false)}
+        handleConfirm={handleDeleteBillProcess}
+        loading={loadingDeleteBill}
+        message={t('messages.delete-item')}
+      />
+      <BillModal
+        open={showBillDetails}
+        handleCancel={() => setShowBillDetails(false)}
+        data={billDetails || {}}
+      />{' '}
       <Stack
         paddingY={5}
         gap={7}
@@ -136,6 +150,14 @@ const MyActivity = () => {
           </Typography>
         </Stack>
 
+        <Button
+          variant="contained"
+          color="error"
+          sx={{ bgcolor: secondaryColor, color: 'white', width: 200 }}
+          onClick={handleDeleteItem}
+        >
+          {t('buttons.delete-selected')}
+        </Button>
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -171,7 +193,13 @@ const MyActivity = () => {
                         key={bill?._id}
                         onClick={() => setBillDetails(bill)}
                       >
-                        <TableCell align="center">{i + 1}</TableCell>
+                        <TableCell align="center">
+                          <Checkbox
+                            checked={selectedBills.includes(bill._id)}
+                            onChange={() => handleSelectBill(bill._id)}
+                            color="warning"
+                          />
+                        </TableCell>
                         <TableCell align="center">
                           {bill?.details?.total}$
                         </TableCell>
@@ -193,14 +221,6 @@ const MyActivity = () => {
                           >
                             {t('buttons.show-details')}
                           </Button>{' '}
-                          <Button
-                            variant="contained"
-                            color="error"
-                            sx={{ bgcolor: secondaryColor, color: 'white' }}
-                            onClick={() => handleDeleteItem(bill?._id)}
-                          >
-                            {t('buttons.delete')}
-                          </Button>
                         </TableCell>
                       </TableRow>
                     );
@@ -250,4 +270,4 @@ const MyActivity = () => {
   );
 };
 
-export default MyActivity;
+export default MyBills;

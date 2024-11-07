@@ -58,6 +58,18 @@
 
     }
 
+    .print-disabled{
+        background: transparent;
+        cursor: default !important;
+        &:hover {
+            background: transparent !important;
+        }
+
+        &:active {
+            background: transparent !important;
+        }
+    }
+
     .add-to-cash {
         padding: 10px;
     }

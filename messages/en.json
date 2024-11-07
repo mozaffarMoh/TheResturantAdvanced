@@ -31,7 +31,8 @@
         "total": "Bill total",
         "date": "Date",
         "time": "Time",
-        "details": "Details"
+        "details": "Details",
+        "select": "Select"
     },
     "buttons": {
         "confirm": "Confirm",
@@ -41,7 +42,12 @@
         "show-details": "Show Details",
         "back": "Back",
         "delete": "Delete",
+        "delete-selected" : "Delete Selected",
         "edit": "Edit"
+    },
+    "labels": {
+        "add-type": "Add Type",
+        "password": "Password"
     },
     "messages": {
         "clear-cash": "Are you sure you want to clear all cash",
@@ -49,10 +55,8 @@
         "no-data": "No Data",
         "image-type-error": "file type is not supported",
         "image-max-size-error": "Image should be 1MB or less",
-        "not-empty": "Value shuold not be empty"
-    },
-    "labels": {
-        "add-type": "Add Type"
+        "not-empty": "Value shuold not be empty",
+        "password-confirm": "Please enter password to clear !"
     },
     "apiMessages": {
         "successAdd": "Added successfully",
@@ -61,6 +65,8 @@
         "errorDeleteId": "Id is not exist",
         "errorDeleteNotFound": "'Item not found or already deleted'",
         "error": "Unexpected Error",
-        "successClearCash": "Clear cash has been success"
+        "successClearCash": "Clear cash has been success",
+        "billIsEmpty": "Bill Content is empty",
+        "incorrectPasswrod": "Incorrect Passwrod !!"
     }
 }
