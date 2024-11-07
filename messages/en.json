@@ -33,7 +33,8 @@
         "time": "Time",
         "details": "Details",
         "select": "Select",
-        "search-by-date":"Enter Bills Date"
+        "search-by-date": "Enter Bills Date",
+        "total-day-price": "Total for this day"
     },
     "buttons": {
         "confirm": "Confirm",

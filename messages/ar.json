@@ -33,7 +33,8 @@
         "time": "الوقت",
         "details": "التفاصيل",
         "select": "تحديد",
-        "search-by-date": "أدخل تاريخ الفواتير"
+        "search-by-date": "أدخل تاريخ الفواتير",
+        "total-day-price": "إجمالي  فواتير هذا اليوم"
     },
     "buttons": {
         "confirm": "تأكيد",

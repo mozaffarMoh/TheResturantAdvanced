@@ -11,6 +11,7 @@ import {
   TableBody,
   TableCell,
   TableContainer,
+  TableFooter,
   TableHead,
   TableRow,
   Typography,
@@ -29,6 +30,8 @@ import localeData from 'dayjs/plugin/localeData';
 import weekday from 'dayjs/plugin/weekday';
 import weekOfYear from 'dayjs/plugin/weekOfYear';
 import weekYear from 'dayjs/plugin/weekYear';
+import CustomSkeleton from '@/components/skeleton/CustomSkeleton';
+import { usePathname } from 'next/navigation';
 
 dayjs.extend(customParseFormat);
 dayjs.extend(advancedFormat);
@@ -39,6 +42,8 @@ dayjs.extend(weekYear);
 
 const MyBills = () => {
   const t = useTranslations();
+  const pathname = usePathname();
+  const isArabic = pathname.startsWith('/ar');
   const [isClientSide, setIsClientSide] = useState(false);
   const [showBillDetails, setShowBillDetails] = useState(false);
   const [billDetails, setBillDetails] = useState({});
@@ -46,6 +51,7 @@ const MyBills = () => {
   const [currentDate, setCurrentDate]: any = useState<dayjs.Dayjs | null>(null);
   const [currentDateString, setCurrentDateString]: any = useState('');
   const [selectedBills, setSelectedBills] = useState<string[]>([]);
+  const [totalDayPrice, setTotalDayPrice] = useState(0);
 
   const labels = [
     t('my-bills.select'),
@@ -107,7 +113,16 @@ const MyBills = () => {
       Array.isArray(dateString) ? dateString[0] : dateString,
     );
   };
-  console.log(currentDate);
+
+  useEffect(() => {
+    if (successBills) {
+      let totalPrice = 0;
+      bills.forEach((item: any) => {
+        totalPrice += Number(item?.details?.total);
+      });
+      setTotalDayPrice(totalPrice);
+    }
+  }, [successBills]);
 
   return (
     <Container maxWidth="lg">
@@ -209,7 +224,10 @@ const MyBills = () => {
                         key={bill?._id}
                         onClick={() => setBillDetails(bill)}
                       >
-                        <TableCell align="center">
+                        <TableCell
+                          align="center"
+                          width={200}
+                        >
                           <Checkbox
                             checked={selectedBills.includes(bill._id)}
                             onChange={() => handleSelectBill(bill._id)}
@@ -243,6 +261,25 @@ const MyBills = () => {
                   })}
             </TableBody>
           </Table>
+          {bills?.length > 0 && (
+            <Stack
+              direction={'row'}
+              paddingY={3}
+              paddingX={isArabic ? 5 : 10}
+              justifyContent={'flex-end'}
+            >
+              {t('my-bills.total-day-price')} :{' '}
+              {loadingBills ? (
+                <Skeleton
+                  width={50}
+                  sx={{ mx: 1 }}
+                />
+              ) : (
+                totalDayPrice
+              )}{' '}
+              $
+            </Stack>
+          )}
           {successBills && bills?.length == 0 && <NoData />}
         </TableContainer>
 
