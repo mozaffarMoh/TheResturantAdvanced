@@ -1,16 +1,9 @@
 'use client';
-import {
-  fourthColor,
-  primaryColor,
-  secondaryColor,
-  thirdColor,
-} from '@/constant/color';
+import { primaryColor, secondaryColor } from '@/constant/color';
 import {
   Button,
   Checkbox,
   Container,
-  Pagination,
-  PaginationItem,
   Paper,
   Skeleton,
   Stack,
@@ -24,30 +17,22 @@ import {
 } from '@mui/material';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
-import Cookies from 'js-cookie';
 import useGet from '@/custom-hooks/useGet';
-import {
-  ArrowBackIosNewRounded,
-  ArrowForwardIosRounded,
-  CheckBox,
-} from '@mui/icons-material';
-import { usePathname } from 'next/navigation';
-import usePost from '@/custom-hooks/usePost';
 import NoData from '@/components/NoData/NoData';
 import { BillModal, ConfirmationModal, CustomAlert } from '@/components';
 import useDelete from '@/custom-hooks/useDelete';
+import { DatePicker } from 'antd';
+import { format } from 'date-fns';
+import dayjs from 'dayjs';
 
 const MyBills = () => {
   const t = useTranslations();
-  const pathname = usePathname();
-  let isArabic = pathname.startsWith('/ar');
-  const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
   const [isClientSide, setIsClientSide] = useState(false);
   const [showBillDetails, setShowBillDetails] = useState(false);
   const [billDetails, setBillDetails] = useState({});
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
-  const [currentId, setCurrentId] = useState(0);
+  const [currentDate, setCurrentDate]: any = useState<dayjs.Dayjs | null>(null);
+  const [currentDateString, setCurrentDateString]: any = useState('');
   const [selectedBills, setSelectedBills] = useState<string[]>([]);
 
   const labels = [
@@ -58,7 +43,9 @@ const MyBills = () => {
     t('my-bills.details'),
   ];
 
-  const [bills, loadingBills, getBills, successBills] = useGet('/en/api/bills');
+  const [bills, loadingBills, getBills, successBills] = useGet(
+    `/en/api/bills?param=${currentDateString}`
+  );
 
   const [
     ,
@@ -70,14 +57,15 @@ const MyBills = () => {
   ] = useDelete('/en/api/bills', { billsIDs: selectedBills });
 
   useEffect(() => {
-    setSelectedBills([]);
-    getBills();
-    setIsClientSide(true);
-  }, []);
-
-  const handleChange = (e: any, value: number) => {
-    setPage(value);
-  };
+    !isClientSide && setIsClientSide(true);
+    if (!currentDate && !currentDateString) {
+      const today = dayjs();
+      setCurrentDate(today);
+      setCurrentDateString(today.format('YYYY-MM-DD'));
+    } else {
+      getBills();
+    }
+  }, [currentDate, currentDateString]);
 
   const handleSelectBill = (id: string) => {
     setSelectedBills((prev) =>
@@ -96,11 +84,19 @@ const MyBills = () => {
   useEffect(() => {
     if (successDeleteBill) {
       setShowDeleteConfirmation(false);
-      setCurrentId(0);
       getBills();
       setSelectedBills([]);
     }
   }, [successDeleteBill]);
+
+  const handleSetDate = (date: any, dateString: string | string[]) => {
+    setCurrentDate(date);
+    // Ensure `dateString` is treated as a single string
+    setCurrentDateString(
+      Array.isArray(dateString) ? dateString[0] : dateString,
+    );
+  };
+  console.log(currentDate);
 
   return (
     <Container maxWidth="lg">
@@ -148,6 +144,14 @@ const MyBills = () => {
           >
             {t('header.bills')}
           </Typography>
+        </Stack>
+
+        <Stack width={200}>
+          <DatePicker
+            //value={currentDate}
+            onChange={handleSetDate}
+            format="YYYY-MM-DD"
+          />{' '}
         </Stack>
 
         <TableContainer component={Paper}>

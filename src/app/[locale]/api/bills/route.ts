@@ -4,13 +4,30 @@ import { ObjectId } from 'mongodb';
 
 
 export async function GET(req: NextRequest) {
+    const acceptLanguage = req.headers.get('accept-language') || 'en';
+    const language = acceptLanguage?.split(',')?.[0]?.split('-')?.[0];
+
+    const messages = await import(`../../../../../messages/${language}.json`).catch(() => import('../../../../../messages/en.json'));
+
+    const { searchParams } = new URL(req.url);
+    const inputDate = searchParams.get('param');
+
+
     try {
         const client = await clientPromise;
         const db = client.db('menu');
         const bills = await db.collection('bills').find({}).toArray();
-        return NextResponse.json({ success: true, data: bills });
+
+        let filterdArray: any = []
+        bills.map((item) => {
+            if (item?.details?.date == inputDate) {
+                filterdArray.push(item)
+            }
+        })
+
+        return NextResponse.json({ success: true, data: filterdArray });
     } catch (error) {
-        return NextResponse.json({ success: false, message: 'Database connection error' }, { status: 500 });
+        return NextResponse.json({ success: false, message: messages.apiMessages.error }, { status: 500 });
     }
 }
 
@@ -75,10 +92,9 @@ export async function DELETE(req: NextRequest) {
 
         const results = await Promise.allSettled(deletionPromises);
 
-        return NextResponse.json({ success: true, message: messages.apiMessages.successDelete,results:results });
+        return NextResponse.json({ success: true, message: messages.apiMessages.successDelete, results: results });
     } catch (error) {
         console.error('Error deleting items:', error);
         return NextResponse.json({ success: false, message: messages.apiMessages.error }, { status: 500 });
     }
 }
-

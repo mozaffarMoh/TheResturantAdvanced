@@ -22,7 +22,7 @@ const useGet = (endPoint: string): any => {
         setSuccess(false);
         setLoading(true);
         axios
-            .get(endPoint,{headers})
+            .get(endPoint, { headers })
             .then((res: any) => {
                 setSuccess(true);
                 setLoading(false);
