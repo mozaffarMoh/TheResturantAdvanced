@@ -32,7 +32,8 @@
         "date": "التاريخ",
         "time": "الوقت",
         "details": "التفاصيل",
-        "select": "تحديد"
+        "select": "تحديد",
+        "search-by-date": "أدخل تاريخ الفواتير"
     },
     "buttons": {
         "confirm": "تأكيد",

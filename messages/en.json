@@ -32,7 +32,8 @@
         "date": "Date",
         "time": "Time",
         "details": "Details",
-        "select": "Select"
+        "select": "Select",
+        "search-by-date":"Enter Bills Date"
     },
     "buttons": {
         "confirm": "Confirm",

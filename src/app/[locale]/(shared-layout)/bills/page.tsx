@@ -1,5 +1,5 @@
 'use client';
-import { primaryColor, secondaryColor } from '@/constant/color';
+import { fourthColor, primaryColor, secondaryColor } from '@/constant/color';
 import {
   Button,
   Checkbox,
@@ -22,8 +22,20 @@ import NoData from '@/components/NoData/NoData';
 import { BillModal, ConfirmationModal, CustomAlert } from '@/components';
 import useDelete from '@/custom-hooks/useDelete';
 import { DatePicker } from 'antd';
-import { format } from 'date-fns';
 import dayjs from 'dayjs';
+import advancedFormat from 'dayjs/plugin/advancedFormat';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import localeData from 'dayjs/plugin/localeData';
+import weekday from 'dayjs/plugin/weekday';
+import weekOfYear from 'dayjs/plugin/weekOfYear';
+import weekYear from 'dayjs/plugin/weekYear';
+
+dayjs.extend(customParseFormat);
+dayjs.extend(advancedFormat);
+dayjs.extend(weekday);
+dayjs.extend(localeData);
+dayjs.extend(weekOfYear);
+dayjs.extend(weekYear);
 
 const MyBills = () => {
   const t = useTranslations();
@@ -44,7 +56,7 @@ const MyBills = () => {
   ];
 
   const [bills, loadingBills, getBills, successBills] = useGet(
-    `/en/api/bills?param=${currentDateString}`
+    `/en/api/bills?param=${currentDateString}`,
   );
 
   const [
@@ -91,7 +103,6 @@ const MyBills = () => {
 
   const handleSetDate = (date: any, dateString: string | string[]) => {
     setCurrentDate(date);
-    // Ensure `dateString` is treated as a single string
     setCurrentDateString(
       Array.isArray(dateString) ? dateString[0] : dateString,
     );
@@ -146,11 +157,20 @@ const MyBills = () => {
           </Typography>
         </Stack>
 
-        <Stack width={200}>
+        <Stack
+          width={200}
+          gap={1}
+        >
+          <Typography
+            color={fourthColor}
+            variant="body2"
+            fontWeight={400}
+          >
+            {t('my-bills.search-by-date')}
+          </Typography>
           <DatePicker
-            //value={currentDate}
+            value={currentDate}
             onChange={handleSetDate}
-            format="YYYY-MM-DD"
           />{' '}
         </Stack>
 
@@ -171,7 +191,7 @@ const MyBills = () => {
             </TableHead>
 
             <TableBody>
-              {loadingBills && bills.length == 0
+              {loadingBills
                 ? // Render Skeletons when loading
                   Array.from(new Array(5)).map((_, index) => (
                     <TableRow key={index}>
