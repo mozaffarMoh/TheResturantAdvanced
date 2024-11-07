@@ -4,11 +4,17 @@ import { TiDocumentDelete } from 'react-icons/ti';
 import { MdDelete } from 'react-icons/md';
 import { FcPrint } from 'react-icons/fc';
 import { Table } from 'antd';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import { useTranslations } from 'next-intl';
 import ConfirmationModal from '../ConfirmationModal/ConfirmationModal';
 import { usePathname } from 'next/navigation';
+import { format } from 'date-fns';
+import { CircularProgress, Stack } from '@mui/material';
+import usePost from '@/custom-hooks/usePost';
+import useGet from '@/custom-hooks/useGet';
+import CustomSkeleton from '../skeleton/CustomSkeleton';
+import CustomAlert from '../CustomAlert/CustomAlert';
 
 const Bill = ({ setBillData, billData }: any) => {
   const t = useTranslations();
@@ -20,8 +26,38 @@ const Bill = ({ setBillData, billData }: any) => {
     React.useState(false);
   const [hoverIndex, setHoverIndex] = React.useState(0);
   const [totalPrice, setTotalPrice] = React.useState(0);
-  const totalCashCookies: any = Cookies.get('totalCash');
-  const [totalCash, setTotalCash]: any = React.useState(totalCashCookies | 0);
+  const [billPayload, setBillPayload]: any = React.useState(null);
+
+  const [
+    ,
+    loadingAddBill,
+    handleAddBill,
+    successAddBill,
+    successAddBillMessage,
+    errorAddBillMessage,
+  ] = usePost('/en/api/bills', billPayload);
+
+  const [totalCash, loadingGetTotalCash, handleGetTotalCash] =
+    useGet('/en/api/totalCash');
+
+  const [
+    ,
+    loadingClearTotalCash,
+    handleClearTotalCash,
+    successClearTotalCash,
+    successClearTotalCashMessage,
+    errorClearTotalCashMessage,
+  ] = usePost('/en/api/totalCash', 0);
+
+  useEffect(() => {
+    handleGetTotalCash();
+  }, []);
+
+  useEffect(() => {
+    if (billPayload && billData?.length > 0) {
+      handleAddBill();
+    }
+  }, [billPayload]);
 
   const columns: any = [
     {
@@ -121,25 +157,57 @@ const Bill = ({ setBillData, billData }: any) => {
     });
   };
 
-  /* Remove cash */
-  const removeCash = () => {
-    Cookies.remove('totalCash');
-    setTotalCash(0);
-    setShowRemoveCashConfirmation(false);
+  const addBill = () => {
+    /* remove images from payload */
+    let dataWithoutImages = billData.map((item: any) => {
+      delete item?.image;
+      return item;
+    });
+    let bills = {
+      items: dataWithoutImages,
+      details: {
+        date: format(new Date(), 'yyyy-MM-dd'), // Format date as YYYY-MM-DD
+        time: format(new Date(), 'hh:mm:ss a'), // Format time as HH:MM:SS
+        total: totalPrice,
+      },
+    };
+    setBillPayload(bills);
   };
 
-  /* Add bill to cash and remove current array */
-  const addToCash = () => {
-    setTotalCash((prev: any) => prev + totalPrice);
-  };
-
-  /* Set cash in cookies */
-  React.useEffect(() => {
-    Cookies.set('totalCash', totalCash);
-  }, [totalCash]);
+  useEffect(() => {
+    if (successAddBill || successClearTotalCash) {
+      setBillPayload(null);
+      setBillData([]);
+      handleGetTotalCash();
+      setShowRemoveCashConfirmation(false);
+    }
+  }, [successAddBill, successClearTotalCash]);
 
   return (
     <div className="bill">
+      <CustomAlert
+        openAlert={
+          Boolean(errorClearTotalCashMessage) || Boolean(errorAddBillMessage)
+        }
+        setOpenAlert={() => {}}
+        message={errorClearTotalCashMessage || errorAddBillMessage}
+      />
+      <CustomAlert
+        openAlert={
+          Boolean(successClearTotalCashMessage) ||
+          Boolean(successAddBillMessage)
+        }
+        type="success"
+        setOpenAlert={() => {}}
+        message={successClearTotalCashMessage || successAddBillMessage}
+      />
+      <ConfirmationModal
+        open={showRemoveCashConfirmation}
+        loading={loadingClearTotalCash}
+        handleCancel={() => setShowRemoveCashConfirmation(false)}
+        handleConfirm={handleClearTotalCash}
+        message={t('messages.clear-cash')}
+      />
       <Table
         className="table-container"
         dataSource={billData}
@@ -148,17 +216,20 @@ const Bill = ({ setBillData, billData }: any) => {
         footer={() => (
           <p>
             {t('table.total-price')}: &nbsp;{' '}
-            <span className="total-price">{totalPrice}</span> $
+            <span className="total-price">{totalPrice + ' '}$</span>
           </p>
         )}
         scroll={{ x: 420 }}
-        pagination={{
-          defaultPageSize: 10, // Or whatever your page size is
-      
-          style: {
-            direction: 'ltr', // Ensure LTR pagination direction
-          },
-        }}
+        pagination={
+          billData?.length > 10
+            ? {
+                pageSize: 10, // Or whatever your page size is
+                style: {
+                  direction: 'ltr', // Ensure LTR pagination direction
+                },
+              }
+            : false
+        }
       />
 
       <div style={{ position: 'relative' }}>
@@ -171,9 +242,17 @@ const Bill = ({ setBillData, billData }: any) => {
         </button>
         <button
           className="add-to-cash"
-          onClick={addToCash}
+          onClick={addBill}
         >
-          <p>{t('bill.add-to-cash')}</p>
+          {loadingAddBill ? (
+            <CircularProgress
+              color="error"
+              size={20}
+              sx={{ mt: 0.8 }}
+            />
+          ) : (
+            <p>{t('bill.add-to-cash')}</p>
+          )}
         </button>
         <button
           className="add-to-cash"
@@ -183,18 +262,19 @@ const Bill = ({ setBillData, billData }: any) => {
         </button>
 
         <div className="total-cash flexCenterColumn">
-          <p>
+          <Stack
+            direction={'row'}
+            gap={1}
+          >
             {t('bill.total-cash')} :{' '}
-            {totalCashCookies ? totalCashCookies : totalCash} $
-          </p>
+            {loadingGetTotalCash ? (
+              <CustomSkeleton width={40} />
+            ) : (
+              totalCash || 0
+            )}{' '}
+            $
+          </Stack>
         </div>
-
-        <ConfirmationModal
-          open={showRemoveCashConfirmation}
-          handleCancel={() => setShowRemoveCashConfirmation(false)}
-          handleConfirm={removeCash}
-          message={t('messages.clear-cash')}
-        />
       </div>
     </div>
   );

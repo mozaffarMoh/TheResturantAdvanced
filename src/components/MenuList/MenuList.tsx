@@ -33,6 +33,7 @@ const MenuList = ({ setBillData, billData }: any) => {
       return newArr;
     });
   };
+  
 
   return (
     <div className="MenuList">

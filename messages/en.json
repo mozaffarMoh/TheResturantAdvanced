@@ -28,7 +28,7 @@
     },
     "my-bills": {
         "id": "ID",
-        "total": "Total",
+        "total": "Bill total",
         "date": "Date",
         "time": "Time",
         "details": "Details"
@@ -60,6 +60,7 @@
         "successEdit": "Edit successfully",
         "errorDeleteId": "Id is not exist",
         "errorDeleteNotFound": "'Item not found or already deleted'",
-        "error": "Unexpected Error"
+        "error": "Unexpected Error",
+        "successClearCash": "Clear cash has been success"
     }
 }

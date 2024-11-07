@@ -32,7 +32,8 @@ import {
 import { usePathname } from 'next/navigation';
 import usePost from '@/custom-hooks/usePost';
 import NoData from '@/components/NoData/NoData';
-import { BillModal } from '@/components';
+import { BillModal, ConfirmationModal, CustomAlert } from '@/components';
+import useDelete from '@/custom-hooks/useDelete';
 
 const MyActivity = () => {
   const t = useTranslations();
@@ -42,6 +43,10 @@ const MyActivity = () => {
   const [total, setTotal] = useState(0);
   const [isClientSide, setIsClientSide] = useState(false);
   const [showBillDetails, setShowBillDetails] = useState(false);
+  const [billDetails, setBillDetails] = useState({});
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [currentId, setCurrentId] = useState(0);
+
   const labels = [
     t('my-bills.id'),
     t('my-bills.total'),
@@ -50,52 +55,63 @@ const MyActivity = () => {
     t('my-bills.details'),
   ];
 
-  const dataSource = [
-    {
-      id: '1',
-      total: '100.00',
-      date: '2024-11-01',
-      time: '10:30 AM',
-      details: 'View details',
-    },
-    {
-      id: '2',
-      total: '200.00',
-      date: '2024-11-02',
-      time: '11:00 AM',
-      details: 'View details',
-    },
-    // Add more data as needed
-  ];
+  const [bills, loadingBills, getBills, successBills] = useGet('/en/api/bills');
 
-  const [data, loading, getData, success, , , , fullData] = usePost('', {});
+  const [
+    ,
+    loadingDeleteType,
+    handleDeleteTypeProcess,
+    successDeleteType,
+    successDeleteTypeMessage,
+    errorDeleteTypeMessage,
+  ] = useDelete('/en/api/bills', { itemId: currentId });
+
+  useEffect(() => {
+    getBills();
+    setIsClientSide(true);
+  }, []);
 
   const handleChange = (e: any, value: number) => {
     setPage(value);
   };
 
-  useEffect(() => {
-    getData();
-    setIsClientSide(true);
-  }, []);
+  const handleDeleteItem = (id: any) => {
+    setShowDeleteConfirmation(true);
+    setCurrentId(id);
+  };
 
   useEffect(() => {
-    if (success) {
-      let totalNum = fullData?.meta?.total || 0;
-      const paginationCount = Math.ceil(totalNum / 15);
-      setTotal(paginationCount);
+    if (successDeleteType) {
+      setShowDeleteConfirmation(false);
+      setCurrentId(0);
+      getBills();
     }
-  }, [success]);
-
-  useEffect(() => {
-    total > 0 && getData();
-  }, [page]);
+  }, [successDeleteType]);
 
   return (
     <Container maxWidth="lg">
+      <CustomAlert
+        openAlert={Boolean(errorDeleteTypeMessage)}
+        setOpenAlert={() => {}}
+        message={errorDeleteTypeMessage}
+      />
+      <CustomAlert
+        openAlert={Boolean(successDeleteTypeMessage)}
+        type="success"
+        setOpenAlert={() => {}}
+        message={successDeleteTypeMessage}
+      />
+      <ConfirmationModal
+        open={showDeleteConfirmation}
+        handleCancel={() => setShowDeleteConfirmation(false)}
+        handleConfirm={handleDeleteTypeProcess}
+        loading={loadingDeleteType}
+        message={t('messages.delete-item')}
+      />
       <BillModal
         open={showBillDetails}
         handleCancel={() => setShowBillDetails(false)}
+        data={billDetails || {}}
       />{' '}
       {isClientSide && (
         <head>
@@ -137,7 +153,7 @@ const MyActivity = () => {
             </TableHead>
 
             <TableBody>
-              {loading && !success
+              {loadingBills && bills.length == 0
                 ? // Render Skeletons when loading
                   Array.from(new Array(5)).map((_, index) => (
                     <TableRow key={index}>
@@ -148,14 +164,26 @@ const MyActivity = () => {
                       ))}
                     </TableRow>
                   ))
-                : dataSource &&
-                  dataSource.map((bill: any) => {
+                : bills &&
+                  bills.reverse().map((bill: any, i: number) => {
                     return (
-                      <TableRow key={bill?.id}>
-                        <TableCell align="center">{bill?.id}</TableCell>
-                        <TableCell align="center">{bill?.total}$</TableCell>
-                        <TableCell align="center">{bill?.date}</TableCell>
-                        <TableCell align="center">{bill?.time}</TableCell>
+                      <TableRow
+                        key={bill?._id}
+                        onClick={() => setBillDetails(bill)}
+                      >
+                        <TableCell align="center">{i + 1}</TableCell>
+                        <TableCell align="center">
+                          {bill?.details?.total}$
+                        </TableCell>
+                        <TableCell align="center">
+                          {bill?.details?.date}
+                        </TableCell>
+                        <TableCell
+                          align="center"
+                          sx={{ direction: 'ltr' }}
+                        >
+                          {bill?.details?.time}
+                        </TableCell>
                         <TableCell align="center">
                           <Button
                             variant="contained"
@@ -164,6 +192,14 @@ const MyActivity = () => {
                             onClick={() => setShowBillDetails(true)}
                           >
                             {t('buttons.show-details')}
+                          </Button>{' '}
+                          <Button
+                            variant="contained"
+                            color="error"
+                            sx={{ bgcolor: secondaryColor, color: 'white' }}
+                            onClick={() => handleDeleteItem(bill?._id)}
+                          >
+                            {t('buttons.delete')}
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -171,9 +207,10 @@ const MyActivity = () => {
                   })}
             </TableBody>
           </Table>
+          {successBills && bills?.length == 0 && <NoData />}
         </TableContainer>
 
-        {success && data && data.length == 0 && <NoData />}
+        {/*      {success && data && data.length == 0 && <NoData />}
         {data && data.length > 0 && (
           <Stack
             alignItems={'center'}
@@ -207,7 +244,7 @@ const MyActivity = () => {
               )}
             />
           </Stack>
-        )}
+        )} */}
       </Stack>
     </Container>
   );
