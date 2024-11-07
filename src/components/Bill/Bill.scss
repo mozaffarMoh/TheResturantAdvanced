@@ -130,7 +130,8 @@
 }
 
 
-/* Print bill*/
+
+/* Print bill */
 @media print {
     body * {
         visibility: hidden;
@@ -141,12 +142,12 @@
         visibility: visible;
     }
 
-    body {
-        height: 100%;
+    body,
+    .bill {
         margin: 0;
-        /* Reset margin */
         padding: 0;
-        /* Reset padding */
+        height: auto;
+        overflow: hidden;
     }
 
     .bill {
@@ -154,6 +155,10 @@
         position: absolute;
         left: 0;
         top: 0;
+        
+        /* Avoid any automatic page breaks */
+        page-break-inside: avoid;
+        break-inside: avoid;
 
         button,
         table .ant-table-cell:last-child,
@@ -161,6 +166,5 @@
         .total-cash {
             display: none;
         }
-
     }
 }

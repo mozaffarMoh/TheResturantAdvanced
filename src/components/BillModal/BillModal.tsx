@@ -28,13 +28,13 @@ const BillModal = ({ open, handleCancel, data = {} }: any) => {
       title: t('table.unit-price'),
       dataIndex: 'price',
       key: 'price',
-      render: (unit: number) => <p>{unit}$</p>,
+      render: (unit: number) => <p>{unit + ' '}$</p>,
     },
     {
       title: t('table.total-price'),
       dataIndex: 'price',
       key: 'price',
-      render: (unit: number, item: any) => <p>{unit * item?.count}$</p>,
+      render: (unit: number, item: any) => <p>{unit * item?.count + ' '}$</p>,
     },
   ];
 

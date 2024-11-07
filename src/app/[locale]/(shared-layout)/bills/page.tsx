@@ -193,7 +193,7 @@ const MyBills = () => {
                           />
                         </TableCell>
                         <TableCell align="center">
-                          {bill?.details?.total}$
+                          {bill?.details?.total} $
                         </TableCell>
                         <TableCell align="center">
                           {bill?.details?.date}
