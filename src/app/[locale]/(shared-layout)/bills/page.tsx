@@ -218,7 +218,7 @@ const MyBills = () => {
                     </TableRow>
                   ))
                 : bills &&
-                  bills.reverse().map((bill: any, i: number) => {
+                  bills.map((bill: any, i: number) => {
                     return (
                       <TableRow
                         key={bill?._id}
