@@ -3,12 +3,7 @@ import { Drawer, Stack, useMediaQuery } from '@mui/material';
 import './Header.scss';
 import LanguageToggle from '../LanguageToggle/LanguageToggle';
 import { Button } from '@mui/material';
-import {
-  fourthColor,
-  primaryColor,
-  secondaryColor,
-  thirdColor,
-} from '@/constant/color';
+import { fourthColor, secondaryColor } from '@/constant/color';
 import { useTranslations } from 'next-intl';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -53,6 +48,7 @@ const Header = () => {
       let isActive = currentRoute == button.link;
       return (
         <Button
+          href={`/${currentLang}${button.link}`}
           key={index}
           variant="contained"
           color={button.color}
@@ -63,7 +59,7 @@ const Header = () => {
               background: isActive ? fourthColor : 'error',
             },
           }}
-          onClick={() => router.push(`/${currentLang}${button.link}`)}
+          // onClick={() => router.push(`/${currentLang}${button.link}`)}
         >
           {t(button.label)}
         </Button>

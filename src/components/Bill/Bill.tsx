@@ -264,7 +264,7 @@ const Bill = ({ setBillData, billData }: any) => {
 
       <div style={{ position: 'relative' }}>
         <button
-          className={`print-button ${billData?.length == 0 ? 'print-disabled' : ''} flexCenterColumn`}
+          className={`print-button flexCenterColumn ${billData?.length == 0 ? 'print-disabled' : ''} `}
           onClick={handlePrint}
         >
           {loadingAddBill ? (
