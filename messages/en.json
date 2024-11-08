@@ -70,6 +70,6 @@
         "error": "Unexpected Error",
         "successClearCash": "Clear cash has been success",
         "billIsEmpty": "Bill Content is empty",
-        "incorrectPasswrod": "Incorrect Passwrod !!"
+        "incorrectPasswrod": "!! Incorrect Passwrod"
     }
 }

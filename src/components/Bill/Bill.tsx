@@ -5,9 +5,7 @@ import { MdDelete } from 'react-icons/md';
 import { FcPrint } from 'react-icons/fc';
 import { Table } from 'antd';
 import React, { useEffect, useState } from 'react';
-import Cookies from 'js-cookie';
 import { useTranslations } from 'next-intl';
-import ConfirmationModal from '../ConfirmationModal/ConfirmationModal';
 import { usePathname } from 'next/navigation';
 import { format } from 'date-fns';
 import { CircularProgress, Stack } from '@mui/material';
@@ -260,15 +258,7 @@ const Bill = ({ setBillData, billData }: any) => {
           </p>
         )}
         scroll={{ x: 420 }}
-        pagination={
-          billData?.length > 10
-            ? {
-                pageSize: 10, // Or whatever your page size is
-                style: {
-                  direction: 'ltr', // Ensure LTR pagination direction
-                },
-              }
-            : false
+        pagination={false
         }
       />
 
