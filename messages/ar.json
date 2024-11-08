@@ -5,6 +5,11 @@
         "main": "الرئيسية",
         "types": "التصنيفات"
     },
+    "print-paper-data": {
+        "theResturant": "المطعم ",
+        "address": "حمص ,الوعر ,شارع الفردوس",
+        "phone": "هاتف : 0965478965"
+    },
     "table": {
         "actions": "الإجراءات",
         "total-price": "السعر الإجمالي",

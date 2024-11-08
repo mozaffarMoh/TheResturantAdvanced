@@ -8,7 +8,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import { format } from 'date-fns';
-import { CircularProgress, Stack } from '@mui/material';
+import { CircularProgress, Stack, Typography } from '@mui/material';
 import usePost from '@/custom-hooks/usePost';
 import useGet from '@/custom-hooks/useGet';
 import CustomSkeleton from '../skeleton/CustomSkeleton';
@@ -170,13 +170,6 @@ const Bill = ({ setBillData, billData }: any) => {
     setBillPayload(bills);
   };
 
-  useEffect(() => {
-    if (isPrinted) {
-      handleAddBill();
-      setIsPrinted(false);
-    }
-  }, [isPrinted]);
-
   const handlePrint = () => {
     if (billData?.length > 0) {
       addBillToPayload();
@@ -198,6 +191,14 @@ const Bill = ({ setBillData, billData }: any) => {
       };
     }
   }, [billPayload]);
+
+  useEffect(() => {
+    if (isPrinted) {
+      handleAddBill();
+      //console.log('print is on');
+      setIsPrinted(false);
+    }
+  }, [isPrinted]);
 
   useEffect(() => {
     if (successAddBill || successClearTotalCash) {
@@ -246,20 +247,41 @@ const Bill = ({ setBillData, billData }: any) => {
         handleConfirm={handleClearTotalCash}
         setErrorMessage={setErrorMessage}
       />
+
+      {/* This part is hidden this is only for print paper bill */}
+      <Stack
+        className="print-content-date"
+        gap={2}
+      >
+        <Typography
+          textAlign={'center'}
+          className="title"
+        >
+          {' '}
+          {t('print-paper-data.theResturant')}
+        </Typography>
+        <p>{t('print-paper-data.address')}</p>
+        <p>{t('print-paper-data.phone')} </p>
+        <p>
+          {format(new Date(), 'yyyy-MM-dd')} -{' '}
+          {format(new Date(), 'hh:mm:ss a')}
+        </p>
+      </Stack>
+
+      {/* Table Bill */}
       <Table
         className="table-container"
         dataSource={billData}
         columns={columns}
         key={'key'}
         footer={() => (
-          <p>
+          <p className="total-price-footer">
             {t('table.total-price')}: &nbsp;{' '}
             <span className="total-price">{totalPrice + ' '}$</span>
           </p>
         )}
         scroll={{ x: 420 }}
-        pagination={false
-        }
+        pagination={false}
       />
 
       <div style={{ position: 'relative' }}>

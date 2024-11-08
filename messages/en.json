@@ -5,6 +5,11 @@
         "main": "Main",
         "types": "Types"
     },
+    "print-paper-data": {
+        "theResturant": "theResturant",
+        "address": "Homs, Alwaarm, Alferdaws street",
+        "phone": "phone : 0965478965"
+    },
     "table": {
         "actions": "Actions",
         "total-price": "Total Price",

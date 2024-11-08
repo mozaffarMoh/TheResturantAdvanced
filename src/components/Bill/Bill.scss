@@ -13,6 +13,17 @@
         }
     }
 
+    .print-content-date {
+        display: none;
+        font-size: 8px;
+
+        .title {
+            font-size: 12px;
+        }
+
+        margin-bottom: 10px;
+    }
+
     .action-area {
         background-color: white;
         padding: 5px;
@@ -138,9 +149,12 @@
         visibility: hidden;
     }
 
+
     .MenuList {
         display: none !important;
     }
+
+
 
     .bill,
     .bill * {
@@ -170,6 +184,20 @@
         .ant-pagination,
         .total-cash {
             display: none;
+        }
+
+
+        .print-content-date {
+            display: block;
+        }
+
+        .ant-table-thead>tr>th,
+        .ant-table-tbody>tr>td,
+        .ant-table-thead>tr,
+        .ant-table-tbody>tr,
+        .total-price-footer {
+            padding: 0px 4px; // Minimize padding for compact display
+            font-size: 8px; // Adjust font size for readability on receipt
         }
     }
 }
