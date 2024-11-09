@@ -245,7 +245,10 @@ const Bill = ({ setBillData, billData }: any) => {
         }
       />
       <CustomAlert
-        openAlert={successClearTotalCash || successAddBill}
+        openAlert={
+          Boolean(successClearTotalCashMessage) ||
+          Boolean(successAddBillMessage)
+        }
         type="success"
         setOpenAlert={() => {}}
         message={successClearTotalCashMessage || successAddBillMessage}
@@ -347,7 +350,8 @@ const Bill = ({ setBillData, billData }: any) => {
               <CustomSkeleton width={40} />
             ) : (
               totalCash || 0
-            )}
+            )}{' '}
+            $
           </Stack>
         </div>
       </div>
