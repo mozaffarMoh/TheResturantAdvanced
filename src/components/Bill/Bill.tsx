@@ -245,7 +245,7 @@ const Bill = ({ setBillData, billData }: any) => {
         }
       />
       <CustomAlert
-        openAlert={true}
+        openAlert={successClearTotalCash || successAddBill}
         type="success"
         setOpenAlert={() => {}}
         message={successClearTotalCashMessage || successAddBillMessage}
