@@ -29,7 +29,7 @@ const Bill = ({ setBillData, billData }: any) => {
   const [billPayload, setBillPayload]: any = React.useState(null);
   const [isPrinted, setIsPrinted]: any = React.useState(false);
   const [totalCash, setTotalCash] = React.useState(0);
-  const [billCount, setBillCount] = React.useState(0);
+  const [billCount, setBillCount] = React.useState(1);
 
   const [
     ,

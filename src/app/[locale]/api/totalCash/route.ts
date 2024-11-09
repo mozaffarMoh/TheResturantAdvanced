@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
 
         const resultTotalCash = await db.collection('totalCash').updateOne(
             { isTotal: true },
-            { $set: { totalCash: 0, billCount: 0 } }
+            { $set: { totalCash: 0, billCount: 1 } }
         );
 
 
