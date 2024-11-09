@@ -81,6 +81,7 @@ const MyBills = () => {
       setCurrentDate(today);
       setCurrentDateString(today.format('YYYY-MM-DD'));
     } else {
+      setTotalDayPrice(0);
       getBills();
     }
   }, [currentDate, currentDateString]);
