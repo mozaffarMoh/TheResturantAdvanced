@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
         const result = await db.collection('bills').insertOne(dataWithId);
         const resultTotalCash = await db.collection('totalCash').updateOne(
             { isTotal: true },
-            { $inc: { totalCash: newBill?.details?.total || 0 } } // Increment totalCash by newBill's totalPrice
+            { $inc: { totalCash: newBill?.details?.total || 0, billCount: 1 } } // Increment totalCash by newBill's totalPrice
         );
 
 

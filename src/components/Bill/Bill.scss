@@ -149,6 +149,9 @@
         visibility: hidden;
     }
 
+    .MuiSnackbar-root{
+        display: none !important;
+    }
 
     .MenuList {
         display: none !important;

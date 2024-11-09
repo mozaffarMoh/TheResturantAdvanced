@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
         const client = await clientPromise;
         const db = client.db('menu');
         const totalCash = await db.collection('totalCash').find({}).toArray();
-        return NextResponse.json({ success: true, data: totalCash?.[0]?.totalCash });
+        return NextResponse.json({ success: true, data: totalCash?.[0]});
     } catch (error) {
         return NextResponse.json({ success: false, message: 'Database connection error' }, { status: 500 });
     }
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
 
         const resultTotalCash = await db.collection('totalCash').updateOne(
             { isTotal: true },
-            { $set: { totalCash: 0 } }
+            { $set: { totalCash: 0, billCount: 0 } }
         );
 
 

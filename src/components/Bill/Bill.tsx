@@ -28,6 +28,8 @@ const Bill = ({ setBillData, billData }: any) => {
   const [totalPrice, setTotalPrice] = React.useState(0);
   const [billPayload, setBillPayload]: any = React.useState(null);
   const [isPrinted, setIsPrinted]: any = React.useState(false);
+  const [totalCash, setTotalCash] = React.useState(0);
+  const [billCount, setBillCount] = React.useState(0);
 
   const [
     ,
@@ -38,8 +40,12 @@ const Bill = ({ setBillData, billData }: any) => {
     errorAddBillMessage,
   ] = usePost('/en/api/bills', billPayload);
 
-  const [totalCash, loadingGetTotalCash, handleGetTotalCash] =
-    useGet('/en/api/totalCash');
+  const [
+    totalCashDetails,
+    loadingGetTotalCash,
+    handleGetTotalCash,
+    successGetTotalCash,
+  ] = useGet('/en/api/totalCash');
 
   const [
     ,
@@ -129,6 +135,13 @@ const Bill = ({ setBillData, billData }: any) => {
       setTotalPrice((prev) => prev + itemTotal);
     }
   }, [billData]);
+
+  useEffect(() => {
+    if (successGetTotalCash) {
+      setTotalCash(totalCashDetails?.totalCash);
+      setBillCount(totalCashDetails?.billCount);
+    }
+  }, [totalCashDetails]);
 
   /* Remove Item */
   const handleRemoveItem = (index: number) => {
@@ -232,10 +245,7 @@ const Bill = ({ setBillData, billData }: any) => {
         }
       />
       <CustomAlert
-        openAlert={
-          Boolean(successClearTotalCashMessage) ||
-          Boolean(successAddBillMessage)
-        }
+        openAlert={true}
         type="success"
         setOpenAlert={() => {}}
         message={successClearTotalCashMessage || successAddBillMessage}
@@ -260,6 +270,10 @@ const Bill = ({ setBillData, billData }: any) => {
           {' '}
           {t('print-paper-data.theResturant')}
         </Typography>
+        <p>
+          {t('print-paper-data.bill-number')}
+          {billCount}
+        </p>
         <p>{t('print-paper-data.address')}</p>
         <p>{t('print-paper-data.phone')} </p>
         <p>
@@ -333,8 +347,7 @@ const Bill = ({ setBillData, billData }: any) => {
               <CustomSkeleton width={40} />
             ) : (
               totalCash || 0
-            )}{' '}
-            $
+            )}
           </Stack>
         </div>
       </div>

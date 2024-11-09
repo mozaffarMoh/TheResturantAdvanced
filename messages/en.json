@@ -6,6 +6,7 @@
         "types": "Types"
     },
     "print-paper-data": {
+        "bill-number":"Bill number : ",
         "theResturant": "theResturant",
         "address": "Homs, Alwaarm, Alferdaws street",
         "phone": "phone : 0965478965"
