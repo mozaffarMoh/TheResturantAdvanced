@@ -6,7 +6,7 @@
         "types": "Types"
     },
     "print-paper-data": {
-        "bill-number":"Bill number : ",
+        "bill-number": "Bill number : ",
         "theResturant": "theResturant",
         "address": "Homs, Alwaarm, Alferdaws street",
         "phone": "phone : 0965478965"
@@ -34,6 +34,7 @@
     },
     "my-bills": {
         "id": "ID",
+        "number": "Bill number",
         "total": "Bill total",
         "date": "Date",
         "time": "Time",

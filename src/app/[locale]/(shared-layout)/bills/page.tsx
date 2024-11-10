@@ -13,6 +13,7 @@ import {
   TableContainer,
   TableFooter,
   TableHead,
+  TablePagination,
   TableRow,
   Typography,
 } from '@mui/material';
@@ -55,6 +56,7 @@ const MyBills = () => {
 
   const labels = [
     t('my-bills.select'),
+    t('my-bills.number'),
     t('my-bills.total'),
     t('my-bills.date'),
     t('my-bills.time'),
@@ -125,6 +127,23 @@ const MyBills = () => {
     }
   }, [successBills]);
 
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0); // Reset to the first page
+  };
+
+  const paginatedBills =
+    bills?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) || [];
+
   return (
     <Container maxWidth="lg">
       {isClientSide && (
@@ -189,7 +208,6 @@ const MyBills = () => {
             onChange={handleSetDate}
           />{' '}
         </Stack>
-
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -208,58 +226,57 @@ const MyBills = () => {
 
             <TableBody>
               {loadingBills
-                ? // Render Skeletons when loading
-                  Array.from(new Array(5)).map((_, index) => (
+                ? Array.from(new Array(rowsPerPage)).map((_, index) => (
                     <TableRow key={index}>
-                      {Array.from(new Array(5)).map((_, index) => (
-                        <TableCell>
+                      {Array.from(new Array(6)).map((_, index) => (
+                        <TableCell key={index}>
                           <Skeleton variant="text" />
                         </TableCell>
                       ))}
                     </TableRow>
                   ))
-                : bills &&
-                  bills.map((bill: any, i: number) => {
-                    return (
-                      <TableRow
-                        key={bill?._id}
-                        onClick={() => setBillDetails(bill)}
+                : paginatedBills.map((bill: any, i: number) => (
+                    <TableRow
+                      key={bill?._id}
+                      onClick={() => setBillDetails(bill)}
+                    >
+                      <TableCell
+                        align="center"
+                        width={200}
                       >
-                        <TableCell
-                          align="center"
-                          width={200}
+                        <Checkbox
+                          checked={selectedBills.includes(bill._id)}
+                          onChange={() => handleSelectBill(bill._id)}
+                          color="warning"
+                        />
+                      </TableCell>
+                      <TableCell align="center">
+                        {bill?.details?.billCount || 0}
+                      </TableCell>
+                      <TableCell align="center">
+                        {bill?.details?.total} $
+                      </TableCell>
+                      <TableCell align="center">
+                        {bill?.details?.date}
+                      </TableCell>
+                      <TableCell
+                        align="center"
+                        sx={{ direction: 'ltr' }}
+                      >
+                        {bill?.details?.time}
+                      </TableCell>
+                      <TableCell align="center">
+                        <Button
+                          variant="contained"
+                          color="warning"
+                          sx={{ bgcolor: primaryColor, color: 'white' }}
+                          onClick={() => setShowBillDetails(true)}
                         >
-                          <Checkbox
-                            checked={selectedBills.includes(bill._id)}
-                            onChange={() => handleSelectBill(bill._id)}
-                            color="warning"
-                          />
-                        </TableCell>
-                        <TableCell align="center">
-                          {bill?.details?.total} $
-                        </TableCell>
-                        <TableCell align="center">
-                          {bill?.details?.date}
-                        </TableCell>
-                        <TableCell
-                          align="center"
-                          sx={{ direction: 'ltr' }}
-                        >
-                          {bill?.details?.time}
-                        </TableCell>
-                        <TableCell align="center">
-                          <Button
-                            variant="contained"
-                            color="warning"
-                            sx={{ bgcolor: primaryColor, color: 'white' }}
-                            onClick={() => setShowBillDetails(true)}
-                          >
-                            {t('buttons.show-details')}
-                          </Button>{' '}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
+                          {t('buttons.show-details')}
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
             </TableBody>
           </Table>
           {bills?.length > 0 && (
@@ -269,7 +286,7 @@ const MyBills = () => {
               paddingX={isArabic ? 5 : 10}
               justifyContent={'flex-end'}
             >
-              {t('my-bills.total-day-price')} :{' '}
+              {t('my-bills.total-day-price')}:{' '}
               {loadingBills ? (
                 <Skeleton
                   width={50}
@@ -281,7 +298,17 @@ const MyBills = () => {
               $
             </Stack>
           )}
-          {successBills && bills?.length == 0 && <NoData />}
+          {successBills && bills?.length === 0 && <NoData />}
+
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 15,20,25]}
+            component="div"
+            count={bills?.length || 0}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
         </TableContainer>
 
         <Button

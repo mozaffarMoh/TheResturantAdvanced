@@ -29,7 +29,7 @@ const Bill = ({ setBillData, billData }: any) => {
   const [billPayload, setBillPayload]: any = React.useState(null);
   const [isPrinted, setIsPrinted]: any = React.useState(false);
   const [totalCash, setTotalCash] = React.useState(0);
-  const [billCount, setBillCount] = React.useState(1);
+  const [billCount, setBillCount] = React.useState(0);
 
   const [
     ,
@@ -55,10 +55,6 @@ const Bill = ({ setBillData, billData }: any) => {
     successClearTotalCashMessage,
     errorClearTotalCashMessage,
   ] = usePost('/en/api/totalCash', 0);
-
-  useEffect(() => {
-    handleGetTotalCash();
-  }, []);
 
   const columns: any = [
     {
@@ -127,6 +123,17 @@ const Bill = ({ setBillData, billData }: any) => {
     },
   ];
 
+  useEffect(() => {
+    handleGetTotalCash();
+  }, []);
+
+  useEffect(() => {
+    if (successGetTotalCash) {
+      setTotalCash(totalCashDetails?.totalCash);
+      setBillCount(totalCashDetails?.billCount);
+    }
+  }, [totalCashDetails]);
+
   /* Calculate Total Price */
   React.useEffect(() => {
     setTotalPrice(0);
@@ -135,13 +142,6 @@ const Bill = ({ setBillData, billData }: any) => {
       setTotalPrice((prev) => prev + itemTotal);
     }
   }, [billData]);
-
-  useEffect(() => {
-    if (successGetTotalCash) {
-      setTotalCash(totalCashDetails?.totalCash);
-      setBillCount(totalCashDetails?.billCount);
-    }
-  }, [totalCashDetails]);
 
   /* Remove Item */
   const handleRemoveItem = (index: number) => {
@@ -176,6 +176,7 @@ const Bill = ({ setBillData, billData }: any) => {
       details: {
         date: format(new Date(), 'yyyy-MM-dd'), // Format date as YYYY-MM-DD
         time: format(new Date(), 'hh:mm:ss a'), // Format time as HH:MM:SS
+        billCount: billCount,
         total: totalPrice,
       },
     };
@@ -184,7 +185,7 @@ const Bill = ({ setBillData, billData }: any) => {
   };
 
   const handlePrint = () => {
-    if (billData?.length > 0) {
+    if (billData?.length > 0 && billCount > 0) {
       addBillToPayload();
       window.print();
     }
@@ -217,6 +218,7 @@ const Bill = ({ setBillData, billData }: any) => {
     if (successAddBill || successClearTotalCash) {
       setBillPayload(null);
       setTotalPrice(0);
+      setBillCount(0);
       setBillData([]);
       handleGetTotalCash();
       setShowRemoveCashConfirmation(false);
@@ -303,7 +305,7 @@ const Bill = ({ setBillData, billData }: any) => {
 
       <div style={{ position: 'relative' }}>
         <button
-          className={`print-button flexCenterColumn ${billData?.length == 0 ? 'print-disabled' : ''} `}
+          className={`print-button flexCenterColumn ${billData?.length == 0 && billCount > 0 ? 'print-disabled' : ''} `}
           onClick={handlePrint}
         >
           {loadingAddBill ? (
