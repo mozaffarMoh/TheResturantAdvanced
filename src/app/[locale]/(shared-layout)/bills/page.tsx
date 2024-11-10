@@ -21,7 +21,12 @@ import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import useGet from '@/custom-hooks/useGet';
 import NoData from '@/components/NoData/NoData';
-import { BillModal, ConfirmationModal, CustomAlert } from '@/components';
+import {
+  BillModal,
+  ConfirmationModal,
+  CustomAlert,
+  PasswordModal,
+} from '@/components';
 import useDelete from '@/custom-hooks/useDelete';
 import { DatePicker } from 'antd';
 import dayjs from 'dayjs';
@@ -55,6 +60,8 @@ const MyBills = () => {
   const [totalDayPrice, setTotalDayPrice] = useState(0);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const labels = [
     t('my-bills.select'),
@@ -151,7 +158,30 @@ const MyBills = () => {
     setPage(0);
   };
 
-  return (
+  /* is error message show hide it after three seconds */
+  useEffect(() => {
+    if (errorMessage) {
+      setTimeout(() => {
+        setErrorMessage('');
+      }, 3000);
+    }
+  }, [errorMessage]);
+
+  return !isAdmin ? (
+    <>
+      <PasswordModal
+        open={!isAdmin}
+        handleConfirm={() => setIsAdmin(true)}
+        setErrorMessage={setErrorMessage}
+        isAdminModal={true}
+      />{' '}
+      <CustomAlert
+        openAlert={Boolean(errorMessage)}
+        setOpenAlert={() => setErrorMessage('')}
+        message={errorMessage}
+      />
+    </>
+  ) : (
     <Container maxWidth="lg">
       {isClientSide && (
         <head>

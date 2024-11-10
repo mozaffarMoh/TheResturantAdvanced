@@ -53,7 +53,8 @@
         "back": "العودة",
         "delete": "حذف",
         "delete-selected": "حذف المحدد",
-        "edit": "تعديل"
+        "edit": "تعديل",
+        "backToHome": "العودة الى الرئيسية"
     },
     "labels": {
         "add-type": "إضافة نوع",
@@ -67,7 +68,7 @@
         "image-type-error": "نوع الملف غير مدعوم",
         "image-max-size-error": "يجب أن تكون الصورة 1 ميجابايت أو أقل",
         "not-empty": "يجب أن لا تكون القيمة فارغة",
-        "password-confirm": "الرجاء ادخال كلمة المرور للمسح !!"
+        "password-confirm": "الرجاء ادخال كلمة المرور للمسؤول !"
     },
     "apiMessages": {
         "successAdd": "تمت الإضافة بنجاح",

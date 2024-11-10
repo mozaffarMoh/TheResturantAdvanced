@@ -13,7 +13,8 @@ import {
   TextField,
 } from '@mui/material';
 import { useTranslations } from 'next-intl';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { Router } from 'next/router';
 import { useEffect, useState } from 'react';
 
 const PasswordModal = ({
@@ -22,10 +23,13 @@ const PasswordModal = ({
   handleConfirm,
   loading = false,
   setErrorMessage,
+  isAdminModal = false,
 }: any) => {
   const t = useTranslations();
+  const router = useRouter();
   const pathname = usePathname();
   let isArabic = pathname.startsWith('/ar');
+  let curretnLang = isArabic ? 'ar' : 'en';
   const [isFocused, setIsFocused] = useState(false);
   const [password, setPassword] = useState('');
 
@@ -43,6 +47,9 @@ const PasswordModal = ({
     if (errorCheckPasswordMessage) setErrorMessage(errorCheckPasswordMessage);
   }, [successCheckPassword, errorCheckPasswordMessage]);
 
+  const handleBackHome = () => {
+    router.push(`/${curretnLang}`);
+  };
   return (
     <Dialog
       className="logout-alert"
@@ -99,13 +106,13 @@ const PasswordModal = ({
         </LoadingButton>
         <Button
           variant="contained"
-          onClick={handleCancel}
+          onClick={isAdminModal ? handleBackHome : handleCancel}
           sx={{
             background: secondaryColor,
             '&:hover': { background: secondaryColor },
           }}
         >
-          {t('buttons.cancel')}
+          {isAdminModal ? t('buttons.backToHome') : t('buttons.cancel')}
         </Button>
       </DialogActions>
     </Dialog>

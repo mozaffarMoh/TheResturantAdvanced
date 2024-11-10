@@ -53,7 +53,8 @@
         "back": "Back",
         "delete": "Delete",
         "delete-selected": "Delete Selected",
-        "edit": "Edit"
+        "edit": "Edit",
+        "backToHome": "Back to main"
     },
     "labels": {
         "add-type": "Add Type",
@@ -67,7 +68,7 @@
         "image-type-error": "file type is not supported",
         "image-max-size-error": "Image should be 1MB or less",
         "not-empty": "Value shuold not be empty",
-        "password-confirm": "Please enter password to clear !"
+        "password-confirm": "Please enter admin password !"
     },
     "apiMessages": {
         "successAdd": "Added successfully",
