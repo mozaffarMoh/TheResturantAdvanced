@@ -53,6 +53,8 @@ const MyBills = () => {
   const [currentDateString, setCurrentDateString]: any = useState('');
   const [selectedBills, setSelectedBills] = useState<string[]>([]);
   const [totalDayPrice, setTotalDayPrice] = useState(0);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const labels = [
     t('my-bills.select'),
@@ -67,6 +69,9 @@ const MyBills = () => {
     `/en/api/bills?param=${currentDateString}`,
   );
 
+  const paginatedBills =
+    bills?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) || [];
+
   const [
     ,
     loadingDeleteBill,
@@ -76,6 +81,7 @@ const MyBills = () => {
     errorDeleteBillMessage,
   ] = useDelete('/en/api/bills', { billsIDs: selectedBills });
 
+  /* set date and date string for filter bills */
   useEffect(() => {
     !isClientSide && setIsClientSide(true);
     if (!currentDate && !currentDateString) {
@@ -88,6 +94,7 @@ const MyBills = () => {
     }
   }, [currentDate, currentDateString]);
 
+  /* select bills for delete */
   const handleSelectBill = (id: string) => {
     setSelectedBills((prev) =>
       prev.includes(id)
@@ -96,12 +103,14 @@ const MyBills = () => {
     );
   };
 
+  /*is there is selected bills show the confimation dilaog to delete */
   const handleDeleteItem = () => {
     if (selectedBills?.length > 0) {
       setShowDeleteConfirmation(true);
     }
   };
 
+  /* if delete bills success refetch the new bills*/
   useEffect(() => {
     if (successDeleteBill) {
       setShowDeleteConfirmation(false);
@@ -110,6 +119,7 @@ const MyBills = () => {
     }
   }, [successDeleteBill]);
 
+  /* set date to filter */
   const handleSetDate = (date: any, dateString: string | string[]) => {
     setCurrentDate(date);
     setCurrentDateString(
@@ -117,6 +127,7 @@ const MyBills = () => {
     );
   };
 
+  /* set the total day price by calculate all total prices */
   useEffect(() => {
     if (successBills) {
       let totalPrice = 0;
@@ -127,22 +138,18 @@ const MyBills = () => {
     }
   }, [successBills]);
 
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-
+  /* change pagination page */
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
+  /* change rows per page value */
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0); // Reset to the first page
+    setPage(0);
   };
-
-  const paginatedBills =
-    bills?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) || [];
 
   return (
     <Container maxWidth="lg">
@@ -301,11 +308,11 @@ const MyBills = () => {
           {successBills && bills?.length === 0 && <NoData />}
 
           <TablePagination
-            rowsPerPageOptions={[5, 10, 15,20,25]}
             component="div"
             count={bills?.length || 0}
-            rowsPerPage={rowsPerPage}
             page={page}
+            rowsPerPage={rowsPerPage}
+            rowsPerPageOptions={[5, 10, 15, 20, 25]}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
