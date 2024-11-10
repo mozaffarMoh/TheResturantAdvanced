@@ -309,12 +309,24 @@ const MyBills = () => {
 
           <TablePagination
             component="div"
+            style={{ direction: 'ltr' }}
             count={bills?.length || 0}
             page={page}
             rowsPerPage={rowsPerPage}
+            labelRowsPerPage={t('table.rowsPerPage')}
             rowsPerPageOptions={[5, 10, 15, 20, 25]}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
+            labelDisplayedRows={({ from, to, count }) =>
+              isArabic
+                ? `${from}-${to} من ${count !== -1 ? count : `أكثر من ${to}`}`
+                : `${from}-${to} of ${count !== -1 ? count : `more than ${to}`}`
+            }
+            sx={{
+              '& .MuiTablePagination-actions .MuiIconButton-root': {
+                transform: isArabic ? 'rotate(180deg)' : 'none',
+              },
+            }}
           />
         </TableContainer>
 

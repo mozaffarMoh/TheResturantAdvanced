@@ -24,7 +24,8 @@
         "id": "ID",
         "price": "Price",
         "image": "Image",
-        "type": "Type"
+        "type": "Type",
+        "rowsPerPage": "Rows per page :"
     },
     "bill": {
         "print": "Print",
