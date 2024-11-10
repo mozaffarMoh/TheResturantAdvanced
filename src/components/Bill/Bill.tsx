@@ -14,8 +14,9 @@ import useGet from '@/custom-hooks/useGet';
 import CustomSkeleton from '../skeleton/CustomSkeleton';
 import CustomAlert from '../CustomAlert/CustomAlert';
 import PasswordModal from '../PasswordModal/PasswordModal';
+import Cookies from 'js-cookie';
 
-const Bill = ({ setBillData, billData }: any) => {
+const Bill = ({ setBillData, billData, cashierName }: any) => {
   const t = useTranslations();
   const pathname = usePathname();
   const langCurrent = pathname?.slice(1, 3) || 'en';
@@ -177,6 +178,7 @@ const Bill = ({ setBillData, billData }: any) => {
         date: format(new Date(), 'yyyy-MM-dd'), // Format date as YYYY-MM-DD
         time: format(new Date(), 'hh:mm:ss a'), // Format time as HH:MM:SS
         billCount: billCount,
+        cashierName: cashierName,
         total: totalPrice,
       },
     };
@@ -215,13 +217,19 @@ const Bill = ({ setBillData, billData }: any) => {
   }, [isPrinted]);
 
   useEffect(() => {
-    if (successAddBill || successClearTotalCash) {
+    if (successAddBill) {
       setBillPayload(null);
       setTotalPrice(0);
       setBillCount(0);
       setBillData([]);
       handleGetTotalCash();
       setShowRemoveCashConfirmation(false);
+    }
+    if (successClearTotalCash) {
+      Cookies.remove('cashierName');
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
     }
   }, [successAddBill, successClearTotalCash]);
 
@@ -276,9 +284,12 @@ const Bill = ({ setBillData, billData }: any) => {
           {t('print-paper-data.theResturant')}
         </Typography>
         <p>
-          {t('print-paper-data.bill-number')}
-          {billCount}
+          {t('print-paper-data.bill-number')} {billCount}
         </p>
+        <p>
+          {t('print-paper-data.cashierName')} {cashierName}
+        </p>
+
         <p>{t('print-paper-data.address')}</p>
         <p>{t('print-paper-data.phone')} </p>
         <p>
@@ -305,7 +316,7 @@ const Bill = ({ setBillData, billData }: any) => {
 
       <div style={{ position: 'relative' }}>
         <button
-          className={`print-button flexCenterColumn ${billData?.length == 0 && billCount > 0 ? 'print-disabled' : ''} `}
+          className={`print-button flexCenterColumn ${!(billData?.length > 0 && billCount > 0) ? 'print-disabled' : ''} `}
           onClick={handlePrint}
         >
           {loadingAddBill ? (
@@ -321,20 +332,6 @@ const Bill = ({ setBillData, billData }: any) => {
             </>
           )}
         </button>
-        {/*     <button
-          className="add-to-cash"
-          onClick={addBill}
-        >
-          {loadingAddBill ? (
-            <CircularProgress
-              color="error"
-              size={20}
-              sx={{ mt: 0.8 }}
-            />
-          ) : (
-            <p>{t('bill.add-to-cash')}</p>
-          )}
-        </button> */}
         <button
           className="add-to-cash"
           onClick={() => setShowRemoveCashConfirmation(true)}
@@ -356,6 +353,12 @@ const Bill = ({ setBillData, billData }: any) => {
             $
           </Stack>
         </div>
+
+        <button className="total-cash flexCenterColumn">
+          <p>
+            {t('print-paper-data.cashierName')} {cashierName}
+          </p>
+        </button>
       </div>
     </div>
   );

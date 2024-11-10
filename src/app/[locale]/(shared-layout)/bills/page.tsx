@@ -66,6 +66,7 @@ const MyBills = () => {
   const labels = [
     t('my-bills.select'),
     t('my-bills.number'),
+    t('my-bills.cashierName'),
     t('my-bills.total'),
     t('my-bills.date'),
     t('my-bills.time'),
@@ -97,6 +98,8 @@ const MyBills = () => {
       setCurrentDateString(today.format('YYYY-MM-DD'));
     } else {
       setTotalDayPrice(0);
+      setRowsPerPage(5);
+      setPage(0);
       getBills();
     }
   }, [currentDate, currentDateString]);
@@ -265,7 +268,7 @@ const MyBills = () => {
               {loadingBills
                 ? Array.from(new Array(rowsPerPage)).map((_, index) => (
                     <TableRow key={index}>
-                      {Array.from(new Array(6)).map((_, index) => (
+                      {Array.from(new Array(7)).map((_, index) => (
                         <TableCell key={index}>
                           <Skeleton variant="text" />
                         </TableCell>
@@ -290,6 +293,11 @@ const MyBills = () => {
                       <TableCell align="center">
                         {bill?.details?.billCount || 0}
                       </TableCell>
+                      <TableCell align="center">
+                        {bill?.details?.cashierName ||
+                          t('my-bills.unknownCashier')}
+                      </TableCell>
+
                       <TableCell align="center">
                         {bill?.details?.total} $
                       </TableCell>

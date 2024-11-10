@@ -7,6 +7,7 @@
     },
     "print-paper-data": {
         "bill-number": "Bill number : ",
+        "cashierName": "Cashier name :",
         "theResturant": "theResturant",
         "address": "Homs, Alwaarm, Alferdaws street",
         "phone": "phone : 0965478965"
@@ -36,6 +37,8 @@
     "my-bills": {
         "id": "ID",
         "number": "Bill number",
+        "cashierName": "Cashier name",
+        "unknownCashier": "Unknown",
         "total": "Bill total",
         "date": "Date",
         "time": "Time",
@@ -54,11 +57,13 @@
         "delete": "Delete",
         "delete-selected": "Delete Selected",
         "edit": "Edit",
-        "backToHome": "Back to main"
+        "backToHome": "Back to main",
+        "start": "START"
     },
     "labels": {
         "add-type": "Add Type",
-        "password": "Password"
+        "password": "Password",
+        "enterName": "ENTER YOUR NAME TO START"
     },
     "messages": {
         "clear-cash": "Are you sure you want to clear all cash ?",
