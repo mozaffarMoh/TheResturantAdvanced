@@ -92,7 +92,9 @@ const PasswordModal = ({
           onChange={(e: any) => setPassword(e.target.value)}
         />
       </Stack>
-      <DialogActions sx={{ justifyContent: 'center', gap: 2 }}>
+      <DialogActions
+        sx={{ justifyContent: 'center', gap: 2, direction: 'ltr' }}
+      >
         <LoadingButton
           loading={loading || loadingCheck}
           variant="contained"

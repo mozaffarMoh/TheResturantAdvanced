@@ -45,8 +45,7 @@ const LanguageToggle = () => {
 
   const changeLanguage = (e: any) => {
     const value = e.target.value;
-    console.log(e.target.value);
-
+    
     if (value) {
       if (value !== langCurrent) {
         const newPathname = `/${value}${pathname.replace(/^\/(en|ar)/, '')}`;
