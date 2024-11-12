@@ -28,7 +28,6 @@ const Bill = ({ setBillData, billData, cashierName }: any) => {
   const [hoverIndex, setHoverIndex] = React.useState(0);
   const [totalPrice, setTotalPrice] = React.useState(0);
   const [billPayload, setBillPayload]: any = React.useState(null);
-  const [isPrinted, setIsPrinted]: any = React.useState(false);
   const [totalCash, setTotalCash] = React.useState(0);
   const [billCount, setBillCount] = React.useState(0);
 
@@ -189,32 +188,16 @@ const Bill = ({ setBillData, billData, cashierName }: any) => {
   const handlePrint = () => {
     if (billData?.length > 0 && billCount > 0) {
       addBillToPayload();
-      window.print();
     }
   };
 
-  /* add bill after Print */
+  /* add bill to database and print */
   useEffect(() => {
-    const handleAfterPrint = () => {
-      setIsPrinted(true);
-    };
-
-    if (typeof window !== 'undefined' && window.addEventListener) {
-      window.addEventListener('afterprint', handleAfterPrint);
-
-      return () => {
-        window.removeEventListener('afterprint', handleAfterPrint);
-      };
+    if (billPayload) {
+      handleAddBill();
+      window.print();
     }
   }, [billPayload]);
-
-  useEffect(() => {
-    if (isPrinted) {
-      handleAddBill();
-      //console.log('print is on');
-      setIsPrinted(false);
-    }
-  }, [isPrinted]);
 
   useEffect(() => {
     if (successAddBill) {
