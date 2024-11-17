@@ -63,7 +63,8 @@
     "labels": {
         "add-type": "Add Type",
         "password": "Password",
-        "enterName": "ENTER YOUR NAME TO START"
+        "enterName": "ENTER YOUR NAME TO START",
+        "count": "Choose quantity"
     },
     "messages": {
         "clear-cash": "Are you sure you want to clear all cash ?",

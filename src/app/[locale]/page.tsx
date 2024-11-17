@@ -11,6 +11,7 @@ const HomePage: NextPage = () => {
   const [billData, setBillData] = useState([]);
   const [isNameEntered, setIsNameEntered] = useState(false);
   const [cashierName, setCashierName] = useState('');
+  const [chosenCount, setChosenCount] = useState<number>(1);
   let cashNameCookies = Cookies.get('cashierName');
 
   useEffect(() => {
@@ -47,12 +48,14 @@ const HomePage: NextPage = () => {
           <>
             <MenuList
               setBillData={setBillData}
-              billData={billData}
+              chosenCount={chosenCount}
+              setChosenCount={setChosenCount}
             />
             <Bill
               setBillData={setBillData}
               billData={billData}
               cashierName={cashierName}
+              chosenCount={chosenCount}
             />
           </>
         )}

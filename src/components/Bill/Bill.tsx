@@ -16,7 +16,7 @@ import CustomAlert from '../CustomAlert/CustomAlert';
 import PasswordModal from '../PasswordModal/PasswordModal';
 import Cookies from 'js-cookie';
 
-const Bill = ({ setBillData, billData, cashierName }: any) => {
+const Bill = ({ setBillData, billData, cashierName, chosenCount }: any) => {
   const t = useTranslations();
   const pathname = usePathname();
   const langCurrent = pathname?.slice(1, 3) || 'en';
@@ -89,7 +89,7 @@ const Bill = ({ setBillData, billData, cashierName }: any) => {
               className={`action-area flexCenter ${
                 minusOneHover && index === hoverIndex && 'action-area-hover'
               }`}
-              onClick={() => handleMinusOne(index)}
+              onClick={() => handleMinusCount(index)}
             >
               <TiDocumentDelete
                 className="minus-one"
@@ -151,11 +151,11 @@ const Bill = ({ setBillData, billData, cashierName }: any) => {
     });
   };
 
-  const handleMinusOne = (index: number) => {
+  const handleMinusCount = (index: number) => {
     setBillData((prevArr: any) => {
       let newArr = [...prevArr].map((item, i) => {
         if (i === index) {
-          return { ...item, count: item?.count - 1 };
+          return { ...item, count: item?.count - chosenCount };
         } else {
           return item;
         }

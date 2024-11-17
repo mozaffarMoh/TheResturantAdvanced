@@ -1,2 +1,2 @@
 /* vairous images */
-export const logoImage = '/favicon.svg';
+export const testImage = '/test.JFIF';

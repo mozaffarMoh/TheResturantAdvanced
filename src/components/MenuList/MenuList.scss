@@ -4,12 +4,12 @@
     background-color: whitesmoke;
     border-radius: 10px;
     overflow-y: auto;
-
+    position: relative !important;
+    
     .items {
         color: white;
         margin-top: 10px;
         font-size: 30px;
-        padding: 10px;
         user-select: none;
         padding: 20px 30px;
 

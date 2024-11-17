@@ -13,10 +13,10 @@ const Header = () => {
   const t = useTranslations();
   const router = useRouter();
   let pathname = usePathname();
+  let currentLang = pathname.slice(1, 3);
   let pathParts = pathname.split('/');
   let currentRoute: any =
     pathParts.length > 2 ? '/' + pathParts[pathParts.length - 1] : '/';
-  let currentLang = pathname.slice(1, 3);
   const [showDrawer, setShowDrawer] = useState(false);
   const isScreen600 = useMediaQuery('(max-width:600px)');
 
